@@ -2,11 +2,11 @@
 
 This file shall serve as the base for the 100 days of code challange.
 
-## Guideliens
+## Guidelines
 
 - Must code for an hour a day.
   - At least an hour.
-  - Does not include work related code that your do throughout the day.
+  - Does not include work related code that you do throughout the day.
 - Planning does not count towards the coding duration.
   - You should find the resources you will be working with beforehand.
   - You should make sure that any setup that is required is done beforehand.
@@ -16,7 +16,7 @@ This file shall serve as the base for the 100 days of code challange.
 ### Suggested help
 
 - Make use of Pomodoro technique to make sure that you are fully focused throughout.
-  - You can break the pattern if you want to keep working
+  - You can break the pattern if you want to keep working, but you have to do at leat an hour
 
 ### Day structure
 

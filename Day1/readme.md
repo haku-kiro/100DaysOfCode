@@ -11,7 +11,7 @@
 ### Setup
 
 - I will have a base index file, that I can add to and change as needed, as well as a javascript file that will contain all my jquery.
-- I will use a cdn to get the jQUery library.
+- I will use a cdn to get the jQuery library.
 
 ### Suggested plan for tomorrow
 
