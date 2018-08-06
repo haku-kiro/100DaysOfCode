@@ -17,4 +17,3 @@
 ### Suggested plan for tomorrow
 
 - Building on your rest api (made using python and flask)
-- Just a suggestion
