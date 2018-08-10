@@ -1,0 +1,120 @@
+{
+  "version": 3,
+  "targets": {
+    ".NETFramework,Version=v4.6.1": {
+      "Nancy/1.4.4": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Nancy.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Nancy.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win": {
+      "Nancy/1.4.4": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Nancy.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Nancy.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win-x64": {
+      "Nancy/1.4.4": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Nancy.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Nancy.dll": {}
+        }
+      }
+    },
+    ".NETFramework,Version=v4.6.1/win-x86": {
+      "Nancy/1.4.4": {
+        "type": "package",
+        "compile": {
+          "lib/net40/Nancy.dll": {}
+        },
+        "runtime": {
+          "lib/net40/Nancy.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "Nancy/1.4.4": {
+      "sha512": "FT8JT55ICC5JwsYsJvTl6ZkCsMdRTECp3E8s6NLymVTBUZbP+LAfJpV1Eb6OaxlTjBZJkmn0v59Zd2UshxfwsQ==",
+      "type": "package",
+      "path": "nancy/1.4.4",
+      "files": [
+        "lib/net40/Nancy.dll",
+        "lib/net40/Nancy.xml",
+        "nancy.1.4.4.nupkg.sha512",
+        "nancy.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    ".NETFramework,Version=v4.6.1": [
+      "Nancy >= 1.4.4"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\mdjco\\.nuget\\packages\\": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\mdjco\\Documents\\Visual Studio 2017\\Projects\\SimpleWebServer\\SimpleWebServer\\SimpleWebServer.csproj",
+      "projectName": "SimpleWebServer",
+      "projectPath": "C:\\Users\\mdjco\\Documents\\Visual Studio 2017\\Projects\\SimpleWebServer\\SimpleWebServer\\SimpleWebServer.csproj",
+      "packagesPath": "C:\\Users\\mdjco\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\mdjco\\Documents\\Visual Studio 2017\\Projects\\SimpleWebServer\\SimpleWebServer\\obj\\",
+      "projectStyle": "PackageReference",
+      "skipContentFileWrite": true,
+      "configFilePaths": [
+        "C:\\Users\\mdjco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net461"
+      ],
+      "sources": {
+        "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+        "http://axiom.dedicated.co.za:8624/nuget/Astech": {},
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net461": {
+          "projectReferences": {}
+        }
+      }
+    },
+    "frameworks": {
+      "net461": {
+        "dependencies": {
+          "Nancy": {
+            "target": "Package",
+            "version": "[1.4.4, )"
+          }
+        }
+      }
+    },
+    "runtimes": {
+      "win": {
+        "#import": []
+      },
+      "win-x64": {
+        "#import": []
+      },
+      "win-x86": {
+        "#import": []
+      }
+    }
+  }
+}

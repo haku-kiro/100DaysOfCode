@@ -1,0 +1,9 @@
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\bin\Debug\SimpleWebServer.exe.config
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\bin\Debug\SimpleWebServer.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\bin\Debug\SimpleWebServer.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\obj\Debug\SimpleWebServer.csprojAssemblyReference.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\obj\Debug\SimpleWebServer.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\obj\Debug\SimpleWebServer.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\obj\Debug\SimpleWebServer.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\bin\Debug\Nancy.dll
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SimpleWebServer\SimpleWebServer\obj\Debug\SimpleWebServer.csproj.CopyComplete
