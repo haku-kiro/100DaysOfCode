@@ -1,0 +1,7 @@
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\bin\Debug\linqTests.exe.config
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\bin\Debug\linqTests.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\bin\Debug\linqTests.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\obj\Debug\linqTests.csprojAssemblyReference.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\obj\Debug\linqTests.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\obj\Debug\linqTests.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\linqTests\linqTests\obj\Debug\linqTests.pdb
