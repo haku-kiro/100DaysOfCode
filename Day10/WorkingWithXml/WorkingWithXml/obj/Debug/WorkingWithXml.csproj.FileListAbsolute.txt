@@ -1,0 +1,7 @@
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\bin\Debug\WorkingWithXml.exe.config
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\bin\Debug\WorkingWithXml.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\bin\Debug\WorkingWithXml.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\obj\Debug\WorkingWithXml.csprojAssemblyReference.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\obj\Debug\WorkingWithXml.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\obj\Debug\WorkingWithXml.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\WorkingWithXml\WorkingWithXml\obj\Debug\WorkingWithXml.pdb
