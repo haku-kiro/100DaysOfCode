@@ -1,0 +1,7 @@
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\bin\Debug\SerializationExample.exe.config
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\bin\Debug\SerializationExample.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\bin\Debug\SerializationExample.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\obj\Debug\SerializationExample.csprojAssemblyReference.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\obj\Debug\SerializationExample.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\obj\Debug\SerializationExample.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\SerializationExample\SerializationExample\obj\Debug\SerializationExample.pdb

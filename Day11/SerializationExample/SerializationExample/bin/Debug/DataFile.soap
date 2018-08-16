@@ -1,0 +1,23 @@
+<SOAP-ENV:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/" xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/" xmlns:clr="http://schemas.microsoft.com/soap/encoding/clr/1.0" SOAP-ENV:encodingStyle="http://schemas.xmlsoap.org/soap/encoding/">
+<SOAP-ENV:Body>
+<a1:Hashtable id="ref-1" xmlns:a1="http://schemas.microsoft.com/clr/ns/System.Collections">
+<LoadFactor>0.72</LoadFactor>
+<Version>4</Version>
+<Comparer xsi:null="1"/>
+<HashCodeProvider xsi:null="1"/>
+<HashSize>7</HashSize>
+<Keys href="#ref-2"/>
+<Values href="#ref-3"/>
+</a1:Hashtable>
+<SOAP-ENC:Array id="ref-2" SOAP-ENC:arrayType="xsd:anyType[3]">
+<item id="ref-4" xsi:type="SOAP-ENC:string">Fred</item>
+<item id="ref-5" xsi:type="SOAP-ENC:string">Mary</item>
+<item id="ref-6" xsi:type="SOAP-ENC:string">Jeff</item>
+</SOAP-ENC:Array>
+<SOAP-ENC:Array id="ref-3" SOAP-ENC:arrayType="xsd:anyType[3]">
+<item id="ref-7" xsi:type="SOAP-ENC:string">987 Pine Road, Phila., PA 19116</item>
+<item id="ref-8" xsi:type="SOAP-ENC:string">PO Box 112233, Palo Alto, CA 94301</item>
+<item id="ref-9" xsi:type="SOAP-ENC:string">123 Main Steet, Redmond, WA 98052</item>
+</SOAP-ENC:Array>
+</SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
