@@ -1,0 +1,10 @@
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\bin\Debug\NancySelfHost.exe.config
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\bin\Debug\NancySelfHost.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\bin\Debug\NancySelfHost.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\bin\Debug\Nancy.dll
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\bin\Debug\Nancy.Hosting.Self.dll
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\obj\Debug\NancySelfHost.csprojAssemblyReference.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\obj\Debug\NancySelfHost.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\obj\Debug\NancySelfHost.csproj.CopyComplete
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\obj\Debug\NancySelfHost.exe
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\NancySelfHost\NancySelfHost\obj\Debug\NancySelfHost.pdb
