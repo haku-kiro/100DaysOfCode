@@ -1,0 +1,13 @@
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\BasicServiceLib\BasicServiceLib\bin\Debug\BasicServiceLib.dll.config
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\BasicServiceLib\BasicServiceLib\bin\Debug\BasicServiceLib.dll
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\BasicServiceLib\BasicServiceLib\bin\Debug\BasicServiceLib.pdb
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.dll
+C:\Users\mdjco\Documents\Visual Studio 2017\Projects\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.pdb
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\bin\Debug\BasicServiceLib.dll.config
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\bin\Debug\BasicServiceLib.dll
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\bin\Debug\BasicServiceLib.pdb
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.csprojAssemblyReference.cache
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.dll
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\BasicServiceLib\obj\Debug\BasicServiceLib.pdb
