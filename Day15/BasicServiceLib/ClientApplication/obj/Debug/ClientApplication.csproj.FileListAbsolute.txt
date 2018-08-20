@@ -1,0 +1,7 @@
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\bin\Debug\ClientApplication.exe.config
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\bin\Debug\ClientApplication.exe
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\bin\Debug\ClientApplication.pdb
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\obj\Debug\ClientApplication.csprojAssemblyReference.cache
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\obj\Debug\ClientApplication.csproj.CoreCompileInputs.cache
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\obj\Debug\ClientApplication.exe
+C:\Users\mdjco\Desktop\100DaysOfCode\Day15\BasicServiceLib\ClientApplication\obj\Debug\ClientApplication.pdb
