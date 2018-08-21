@@ -45,7 +45,8 @@ namespace SerializationExample
 
         public void Print()
         {
-            Console.WriteLine($"{nameof(member1)} = {member1}");
+
+                Console.WriteLine($"{nameof(member1)} = {member1}");
             Console.WriteLine($"{nameof(member2)} = {member2}");
             Console.WriteLine($"{nameof(member3)} = {member3}");
             Console.WriteLine($"{nameof(member4)} = {member4}");
