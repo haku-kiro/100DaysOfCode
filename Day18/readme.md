@@ -1,18 +1,18 @@
-# Day 17
+# Day 18
 
 ## Objectives
 
-- Some sql
+- Working with c# attributes.
 
 ## Resources
 
 - Google searches
-- Stackoverflow:
-  - <https://stackoverflow.com/questions/4305691/need-to-list-all-triggers-in-sql-server-database-with-table-name-and-tables-sch>
+  - <https://docs.microsoft.com/en-us/dotnet/csharp/tutorials/attributes>
+  - <https://www.tutorialspoint.com/csharp/csharp_attributes.htm>
 
 ### Setup
 
-- Write some semi generic sql scripts using ssms.
+- Create a c# proj with example uses of attributes.
 
 ### Suggested plan for tomorrow
 
@@ -27,6 +27,3 @@
 - Cover the 'See Also' section under: <https://docs.microsoft.com/en-us/dotnet/framework/wcf/how-to-use-a-wcf-client>
 
 ### Random Notes
-
-Should probably look at importing xml data (without using a client written in c# or something similar)
-Something like a bulk insert, like for csv files
