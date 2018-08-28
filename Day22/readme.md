@@ -1,17 +1,16 @@
-# Day 21
+# Day 22
 
 ## Objectives
 
-- Just going to do some random code wars challanges
- - <CodeWars.com>
+- No internet today, but I will be working with a python module called tornado, which helps facilitate the creation of websocket servers; to enable real time communication between server and client.
 
 ## Resources
 
-- Code wars katas (7s and 8s only)
+- Working through 480 Book (Websockets client) and google searches around tornado (a python module). 
 
 ### Setup
 
-- Online ide as well as vs code
+- python file for server, webpage as the client
 
 ### Suggested plan for tomorrow
 
@@ -27,3 +26,5 @@
 - Cover how IL works, and the implications of compiler theory
 
 ### Random Notes
+
+- This was rather difficult to do, no internet made dev slow as well as testing - upload could potentially be delayed as well.
