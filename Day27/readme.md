@@ -1,16 +1,16 @@
-# Day 26
+# Day 27
 
 ## Objectives
 
-- Did some stuff with async/await methods
+- Started a course on edx, computing in python.
 
 ## Resources
 
-- dotnetperls
+- <courses.edx.org>
 
 ### Setup
 
-- vs project
+- online project files. Also have py file for some of the stuff (Mostly been online questions and one liners for now though)
 
 ### Suggested plan for tomorrow
 
@@ -24,7 +24,8 @@
 - Cover the 'See Also' section under: <https://docs.microsoft.com/en-us/dotnet/framework/wcf/how-to-use-a-wcf-client>
 - Do some work with async and await, or some threading - parallel tasks etc
 - Cover how IL works, and the implications of compiler theory
+- Need to look into how to make a method `Awaitable`
 
 ### Random Notes
 
-- Need to look into how to make a method `Awaitable`
+- Make sure to continue with the course (and finish it...)
