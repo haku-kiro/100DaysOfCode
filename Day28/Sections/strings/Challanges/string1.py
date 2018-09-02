@@ -94,7 +94,7 @@ def main():
   test(donuts(10), 'Number of donuts: many')
   test(donuts(99), 'Number of donuts: many')
 
-  print
+  print()
   print('both_ends')
   test(both_ends('spring'), 'spng')
   test(both_ends('Hello'), 'Helo')
@@ -102,7 +102,7 @@ def main():
   test(both_ends('xyz'), 'xyyz')
 
   
-  print
+  print()
   print('fix_start')
   test(fix_start('babble'), 'ba**le')
   test(fix_start('aardvark'), 'a*rdv*rk')

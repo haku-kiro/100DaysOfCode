@@ -28,3 +28,5 @@
 - Still need to finish the edx course on computing with python.
 
 ### Random Notes
+
+- Continue (With the exercises and the lessons from google - practical, and decent level, then do some algorithms)
