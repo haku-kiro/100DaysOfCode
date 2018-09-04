@@ -31,7 +31,7 @@ def RandomiseList(theList):
         newList.append(choice)
         # Handles the duplicate values thing quite elegantly
         theList.remove(choice)
-    return newList 
+    return newList
 
 def SortedEh(listToSort):
     tries = 0
@@ -45,8 +45,8 @@ def SortedEh(listToSort):
             listToSort = RandomiseList(listToSort)
             tries += 1
             
-listTest = [1,2,3,1]
+listTest = [1,2,3,1,21,123,3,7,42] # about the limit for a reasonable time
 SortedEh(listTest)
 
 # Testing random
-print(RandomiseList([1,2,3,4,5]))
+#print(RandomiseList([1,2,3,4,5]))
