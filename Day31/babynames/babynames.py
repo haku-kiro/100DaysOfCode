@@ -58,7 +58,7 @@ def extract_names(filename):
     rankAndNamePattern = r"<tr.*><td>(\d+)</td><td>(\w+)</td><td>(\w+)</td>"
     f.seek(0) # set this to re-read the file after each read/ room for optimization here
     data = re.findall(rankAndNamePattern, f.read())
-
+    
     # This seems like it would be inefficient?
     boyCollection = [f"{boyname} {rank}" for rank, boyname, girlname in data] # we need to make sure that we unpack the tuple correctly, even if we only use one of the vars
     girlCollection = [f"{girlname} {rank}" for rank, boyname, girlname in data]
