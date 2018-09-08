@@ -6,6 +6,8 @@
 # Google's Python Class
 # http://code.google.com/edu/languages/google-python-class/
 
+# This is 
+
 import sys
 import re
 
@@ -64,7 +66,6 @@ def extract_names(filename):
     girlCollection = [f"{girlname} {rank}" for rank, boyname, girlname in data]
     dataset = boyCollection + girlCollection
     dataset.sort()
-
     # I want the result to be in a list, therefore I need to loop over the list
     for item in dataset:
       result.append(item)
