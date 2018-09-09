@@ -31,3 +31,4 @@
 ### Random Notes
 
 - Reading the first chapter - was a lot of theory
+- The creativity exercises at the end are really cool. It's like codewars - but with specific lessons that teach the requirements beforehand. Good book.

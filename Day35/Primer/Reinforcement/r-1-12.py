@@ -23,4 +23,3 @@ print(MyChoice(list))
 
 
 # TODO: there are creativity questions as well as project questions - should look into this as practise at some point
-
