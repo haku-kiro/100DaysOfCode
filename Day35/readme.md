@@ -1,12 +1,12 @@
-# Day 34
+# Day 35
 
 ## Objectives
 
-- python course from google.
+- book, Data Structures and Algorithms in Python - which should cover quite a few good algorithms to learn and practise
 
 ## Resources
 
-- <https://developers.google.com/edu/python/>
+- Data Structures and Algorithms in Python [Goodrich, Tamassia & Goldwasser 2013-03-18]
 
 ### Setup
 
@@ -14,6 +14,7 @@
 
 ### Suggested plan for tomorrow
 
+- Should really go through this content at some point...
 - Writing xml files
   - <https://csharp.net-tutorials.com/xml/writing-xml-with-the-xmlwriter-class/>
 - Do some more stuff with wcf
@@ -28,3 +29,5 @@
 - Still need to finish the edx course on computing with python.
 
 ### Random Notes
+
+- Reading the first chapter - was a lot of theory
