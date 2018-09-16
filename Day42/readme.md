@@ -1,9 +1,9 @@
-# Day 41
+# Day 42
 
 ## Objectives
 
 - book, Data Structures and Algorithms in Python - which should cover quite a few good algorithms to learn and practise
-  - Chapter two of the book, cont
+  - End of chapter two, going on to chapter 3 (Doing some challenges)
 
 ## Resources
 
@@ -31,6 +31,5 @@
 
 ### Random Notes
 
-- I need to catchup -- Just been busy... (No excuse)
-- Picked up on page 87
-- Ending on page 101. Just before the exercises - which is less than ideal, but a new topic that I have little knowledge on is being introduced - shallow and deep copying. (Could relate to ref vs value type)
+- On page 101, shallow and deep copying :D
+- 
