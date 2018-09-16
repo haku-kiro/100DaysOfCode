@@ -32,4 +32,4 @@
 ### Random Notes
 
 - On page 101, shallow and deep copying :D
-- 
+- Page 103, exercises
