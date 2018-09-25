@@ -1,0 +1,4 @@
+Info Message: Creating an instance of DAL, using the connection string: Driver={SQL Server Native Client 11.0};Server=41.180.14.74,64999;Database=CRMDEV;uid=SA;pwd=a$t3ch123
+Info Message: Creating an instance of DAL, using the connection string: Driver={SQL Server Native Client 11.0};Server=41.180.14.74,64999;Database=CRMDEV;uid=SA;pwd=a$t3ch123
+Error Message: Failed to run query: DROP TABLE #temp
+Error Message: Failed to run query: DROP TABLE #temp
