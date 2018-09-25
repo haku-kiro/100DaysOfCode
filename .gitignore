@@ -262,3 +262,6 @@ __pycache__/
 
 # python config files
 Config.py
+
+# random log files 
+LogFile.txt

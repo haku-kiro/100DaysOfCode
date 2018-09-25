@@ -1,4 +1,675 @@
-Info Message: Creating an instance of DAL, using the connection string: Driver={SQL Server Native Client 11.0};Server=41.180.14.74,64999;Database=CRMDEV;uid=SA;pwd=a$t3ch123
-Info Message: Creating an instance of DAL, using the connection string: Driver={SQL Server Native Client 11.0};Server=41.180.14.74,64999;Database=CRMDEV;uid=SA;pwd=a$t3ch123
-Error Message: Failed to run query: DROP TABLE #temp
-Error Message: Failed to run query: DROP TABLE #temp
+Error Message: Failed to run query: DROP VIEW vwTransactionHistory
+Error Message: Failed to run query: DROP VIEW mPersonAllDetailsDelta
+Error Message: Failed to run query: DROP VIEW mPersonAllDetails
+Error Message: Failed to run query: DROP VIEW mOppoList
+Error Message: Failed to run query: DROP VIEW mOppoListDelta
+Error Message: Failed to run query: DROP VIEW vOutboundPriorFirstDebitOrder
+Error Message: Failed to run query: DROP VIEW vPersonFaxMobilePE
+Error Message: Failed to run query: DROP VIEW vPersonMobilePE
+Error Message: Failed to run query: DROP VIEW vCompanyFaxMobilePE
+Error Message: Failed to run query: DROP VIEW vCompanyMobilePE
+Error Message: Failed to run query: DROP VIEW vwUtilityMailMerge
+Error Message: Failed to run query: DROP VIEW vwDashboardRacecountM2006
+Error Message: Failed to run query: DROP VIEW vwDashboardRacecountM2007
+Error Message: Failed to run query: DROP VIEW vwDashboardRacecountM2008
+Error Message: Failed to run query: DROP VIEW vwDashboardRaceCountM2009
+Error Message: Failed to run query: DROP VIEW vDebtorsSummary
+Error Message: Failed to run query: DROP VIEW vLoanBalance
+Error Message: Failed to run query: DROP VIEW vOfficerAgent
+Error Message: Failed to run query: DROP VIEW vLoanContract
+Error Message: Failed to run query: DROP VIEW vSentinel
+Error Message: Failed to run query: DROP VIEW vSentinel
+Error Message: Failed to run query: CREATE VIEW vListAddress
+AS
+SELECT (
+    SELECT CASE 
+        WHEN (Count(*) > 1)
+          THEN 'yes'
+        ELSE 'no'
+        END
+    FROM Address_link
+    WHERE Adli_addressid = Addr_addressid
+      AND Adli_deleted IS NULL
+      AND Adli_type IS NULL
+    ) AS addr_IsMultiLinked,
+  (
+    SELECT CASE 
+        WHEN Companycount = 0
+          OR Accountcount = 0
+          THEN NULL
+        ELSE 'Y'
+        END
+    FROM Vsharedaddress
+    WHERE Vsharedaddress.Adli_addressid = Address_link.Adli_addressid
+    ) AS Addr_IsSharedAddress,
+  (
+    CASE 
+      WHEN Adli_accountid IS NULL
+        THEN (
+            (
+              SELECT Max(Adli_accountid)
+              FROM Address_link TMP_ADDLINK
+              WHERE TMP_ADDLINK.Adli_addressid = Address_link.Adli_addressid
+                AND Adli_accountid IS NOT NULL
+                AND Adli_deleted IS NULL
+              )
+            )
+      ELSE Adli_accountid
+      END
+    ) AS SharedAccountId,
+  RTRIM(ISNULL(Addr_Address1, '')) + '<BR>' + RTRIM(ISNULL(Addr_Address2, '')) + '<BR>' + RTRIM(ISNULL(Addr_Address3, '')) + '<BR>' + RTRIM(ISNULL(Addr_Address4, '')) + '<BR>' + RTRIM(ISNULL(Addr_Address5, '')) AS Addr_Street,
+  Address.*,
+  Address_link.*,
+  (
+    SELECT CASE 
+        WHEN Adli_addressid = Person.Pers_primaryaddressid
+          THEN 'Yes'
+        ELSE 'No'
+        END
+    FROM Person
+    WHERE Person.Pers_personid = Adli_personid
+    ) AS [IsDeliveryAddress]
+FROM Address,
+  Address_link
+WHERE Addr_addressid = Adli_addressid
+  AND Adli_deleted IS NULL
+  AND Addr_deleted IS NULL
+
+Error Message: Failed to run query: CREATE VIEW vPersonAppointment AS SELECT Pers_PersonId, Communication.*, Comm_Link.*, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId FROM Communication LEFT JOIN Comm_Link ON Comm_CommunicationId = CmLi_Comm_CommunicationId LEFT JOIN vPersonPE ON CmLi_Comm_PersonId = Pers_PersonId WHERE UPPER(Comm_Type) = 'APPOINTMENT' AND UPPER(Comm_Status) = 'PENDING' AND Comm_Deleted IS NULL AND CmLi_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vQuoteOpportunity AS SELECT Oppo_OpportunityId, Oppo_PrimaryCompanyId, Oppo_PrimaryAccountId, Oppo_PrimaryPersonId, Oppo_Description, Oppo_Note, Oppo_Product, Oppo_Total, Oppo_Total_CID, Oppo_AssignedUserId, Oppo_SecTerr, Oppo_CreatedBy, Oppo_ChannelId, Comp_CompanyId, Comp_PrimaryAddressId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_EmailAddress, Pers_PersonId, Pers_FirstName, Pers_LastName, Pers_EmailAddress, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Addr_Address1, Addr_AddressId, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_Country, Addr_PostCode, Addr_State FROM Opportunity LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyId = Comp_CompanyId LEFT JOIN vPersonPE ON Oppo_PrimaryPersonId = Pers_PersonId LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId WHERE oppo_deleted is NULL
+Error Message: Failed to run query: CREATE VIEW vListCases AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, CASE WHEN Case_SLACloseBY < GETDATE() AND ((Case_Closed is null) OR (Case_Closed > Case_SLACloseBY)) THEN 'Red' WHEN Case_Status <> 'closed' AND Case_SLAAmberCloseBy < GETDATE() THEN 'Amber' ELSE 'Green' END AS Case_Color, vPersonPE.*, Cases.*, vCompanyPE.*, Address.*, Chan_ChannelId, Chan_Description FROM Cases LEFT JOIN vPersonPE ON Pers_PersonId = Case_PrimaryPersonId AND Pers_Deleted IS NULL LEFT JOIN vCompanyPE ON Comp_CompanyId = Case_PrimaryCompanyId LEFT JOIN Channel ON Comp_ChannelId = Chan_ChannelId LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId WHERE Case_Deleted IS NULL 
+Error Message: Failed to run query: CREATE VIEW vSearchListCompany AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, Company.*, Person.*, Account.*, Address.*, (SELECT CASE WHEN CompanyCount = 0 or AccountCount = 0 THEN NULL ELSE 'Y' END FROM vSharedAddress WHERE vSharedAddress.AdLi_AddressId = Addr_AddressId) as Addr_IsSharedAddress FROM Company LEFT JOIN Person ON Comp_PrimaryPersonId = Pers_PersonId LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId LEFT JOIN Account ON Comp_PrimaryAccountId = Acc_AccountId WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSearchListEmail AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, Pers_LastName, Pers_FirstName, Pers_PrimaryUserId, Pers_SecTerr, Pers_ChannelID, Pers_CreatedBy, Comp_Name, Emai_EmailId, Emai_EmailAddress, Comp_ChannelID, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy FROM vPersonEmail LEFT JOIN Person ON ELink_RecordId = Pers_PersonId LEFT JOIN Company ON Pers_CompanyId = Comp_CompanyId UNION ALL SELECT NULL AS Pers_FullName, NULL AS Pers_LastName, NULL AS Pers_FirstName, NULL AS Pers_PrimaryUserId, NULL AS Pers_SecTerr, NULL AS Pers_ChannelID, NULL AS Pers_CreatedBy, Comp_Name, Emai_EmailId, Emai_EmailAddress, Comp_ChannelID, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy FROM vCompanyEmail LEFT JOIN Company ON ELink_RecordId = Comp_CompanyId 
+Error Message: Failed to run query: CREATE VIEW vPersonPhoneSummary AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName,  RTRIM(REPLACE(REPLACE(ISNULL(Phon_CountryCode, '') + ISNULL(Phon_AreaCode, '') + ISNULL(Phon_Number, ''), '-', ''), ' ', '')) AS Phon_FullNumber,Pers_PersonId, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Pers_Deleted, Pers_CompanyId,Pers_AccountId, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Acc_AccountId, Acc_Name, Acc_PrimaryUserId, Acc_SecTerr, Acc_CreatedBy, Acc_ChannelId FROM vPersonPhone INNER JOIN Person ON PLink_RecordId = Pers_PersonId AND Pers_Deleted IS NULL LEFT JOIN Company ON Pers_CompanyId = Comp_CompanyId LEFT JOIN Account ON Pers_ACcountId = Acc_AccountId UNION ALL SELECT NULL AS Pers_FullName,  RTRIM(REPLACE(REPLACE(ISNULL(Phon_CountryCode, '') + ISNULL(Phon_AreaCode, '') + ISNULL(Phon_Number, ''), '-', ''), ' ', '')) AS Phon_FullNumber,NULL AS Pers_PersonId, NULL AS Pers_PrimaryUserId, NULL AS Pers_SecTerr, NULL AS Pers_CreatedBy, NULL AS Pers_ChannelId, NULL AS Pers_Deleted, NULL AS Pers_CompanyId, NULL AS Pers_AccountId, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, NULL AS Acc_AccountId, NULL AS Acc_Name, NULL AS Acc_PrimaryUserId, NULL AS Acc_SecTerr, NULL AS Acc_CreatedBy, NULL AS Acc_ChannelId FROM vCompanyPhone INNER JOIN Company ON PLink_RecordId = Comp_CompanyId AND Comp_Deleted IS NULL UNION ALL SELECT NULL AS Pers_FullName,  RTRIM(REPLACE(REPLACE(ISNULL(Phon_CountryCode, '') + ISNULL(Phon_AreaCode, '') + ISNULL(Phon_Number, ''), '-', ''), ' ', '')) AS Phon_FullNumber,NULL AS Pers_PersonId, NULL AS Pers_PrimaryUserId, NULL AS Pers_SecTerr, NULL AS Pers_CreatedBy, NULL AS Pers_ChannelId, NULL AS Pers_Deleted, NULL AS Pers_CompanyId, NULL AS Pers_AccountId, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Acc_AccountId, Acc_Name, Acc_PrimaryUserId, Acc_SecTerr, Acc_CreatedBy, Acc_ChannelId FROM vAccountPhone INNER JOIN Account ON PLink_RecordId = Acc_AccountId AND Acc_Deleted IS NULL LEFT JOIN Company ON Acc_CompanyId = Comp_CompanyId
+Error Message: Failed to run query: CREATE VIEW vSummaryPersonComm AS SELECT DISTINCT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, Pers_PersonID, Pers_CompanyID, Pers_PrimaryAddressID, Pers_PrimaryUserID, Pers_Salutation, Pers_FirstName, Pers_LastName, Pers_MiddleName, Pers_Suffix, Pers_Gender, Pers_Title, Pers_TitleCode, Pers_Department, Pers_Status, Pers_Source, Pers_Territory, Pers_Website, Pers_MailRestriction, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_EmailAddress, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_CreatedBy, Pers_CreatedDate, Pers_UpdatedBy, Pers_UpdatedDate, Pers_Timestamp, Pers_Deleted, Pers_LibraryDir, Pers_ChannelID, Pers_UploadDate, Pers_SecTerr, Comp_CompanyID, Comp_PrimaryPersonID, Comp_PrimaryAddressID, Comp_PrimaryUserID, Comp_Name, Comp_Type, Comp_Status, Comp_Source, Comp_Territory, Comp_Revenue, Comp_Employees, Comp_Sector, Comp_IndCode, Comp_Website, Comp_MailRestriction, Comp_PhoneCountryCode, Comp_PhoneAreaCode, Comp_PhoneNumber, Comp_FaxCountryCode, Comp_FaxAreaCode, Comp_FaxNumber, Comp_EmailAddress, Comp_CreatedBy, Comp_CreatedDate, Comp_UpdatedBy, Comp_UpdatedDate, Comp_Timestamp, Comp_Deleted, Comp_LibraryDir, Comp_ChannelID, Comp_SecTerr, CmLi_Comm_UserId, Addr_Street, Addr_AddressID, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode, Addr_CreatedBy, Addr_CreatedDate, Addr_UpdatedBy, Addr_UpdatedDate, Addr_Timestamp, Addr_Deleted, Comm_ChannelID, Comm_SecTerr, Comm_CreatedBy FROM vPersonPE LEFT JOIN Comm_Link ON Pers_PersonId = CmLi_Comm_PersonId LEFT JOIN Communication ON CmLi_Comm_CommunicationId = Comm_CommunicationId LEFT JOIN vAddress ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId WHERE UPPER(Comm_Status) = 'PENDING' AND Pers_Deleted IS NULL AND CmLi_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vCallList AS SELECT *
+ FROM CallList LEFT JOIN vPersonPE ON LCall_PersonID = Pers_PersonID AND Pers_Deleted IS NULL 
+LEFT JOIN WaveItems ON LCall_WaveItemID = WaIt_WaveItemID 
+LEFT JOIN Lead ON LCall_LeadID = Lead_LeadID 
+LEFT JOIN Opportunity ON vPersonPE.pers_personid = Opportunity.oppo_primarypersonId
+CROSS APPLY (
+
+								SELECT ISNULL(SUM(dbo.gettransamount(Tran_TransactionId)), 0) Paid
+								FROM LoanTransaction WITH(NOLOCK)	INNER JOIN Batch WITH(NOLOCK) on btch_BatchId = tran_batchid
+																	INNER JOIN TransactionType WITH(NOLOCK) on trty_transactiontypeid = tran_transactiontype
+								WHERE	btch_Deleted is null 
+										and tran_deleted is null 
+										and trty_deleted is null
+										and btch_status = 'Posted' 
+										and trty_category IN ('Payments', 'Adjustments')
+										and tran_loanId = oppo_opportunityid
+							)TotalPaid
+                    CROSS APPLY (
+									SELECT SUM(pric_price) As Total, SUM(Offset) AS Remaining 
+									FROM dbo.GetLoanMilestonesPaid(oppo_opportunityid)
+								)Remaining
+WHERE LCall_Deleted IS NULL AND NOT ((Pers_PersonID IS NULL) AND (Lead_LeadID IS NULL))
+and oppo_deleted is NULL
+Error Message: Failed to run query: CREATE VIEW vEmailCompanyAndPerson AS SELECT Emai_EmailAddress, Pers_FirstName, Pers_LastName, Pers_PersonId, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Pers_Deleted, Pers_CompanyId, Pers_AccountId, Pers_LibraryDir, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_LibraryDir, Acc_AccountId, Acc_Name, Acc_PrimaryUserId, Acc_SecTerr, Acc_CreatedBy, Acc_ChannelId, Acc_LibraryDir FROM vPersonEmail INNER JOIN vPersonPE ON ELink_RecordId = Pers_PersonId AND Pers_Deleted IS NULL LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN Account ON Pers_ACcountId = Acc_AccountId UNION ALL SELECT Emai_EmailAddress, NULL AS Pers_FirstName, NULL AS Pers_LastName, NULL AS Pers_PersonId, NULL AS Pers_PrimaryUserId, NULL AS Pers_SecTerr, NULL AS Pers_CreatedBy, NULL AS Pers_ChannelId, NULL AS Pers_Deleted, NULL AS Pers_CompanyId, NULL AS Pers_AccountId, NULL AS Pers_LibraryDir, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_LibraryDir, NULL AS Acc_AccountId, NULL AS Acc_Name, NULL AS Acc_PrimaryUserId, NULL AS Acc_SecTerr, NULL AS Acc_CreatedBy, NULL AS Acc_ChannelId, NULL AS Acc_LibraryDir FROM vCompanyEmail INNER JOIN Company ON ELink_RecordId = Comp_CompanyId AND Comp_Deleted IS NULL UNION ALL SELECT Emai_EmailAddress, NULL AS Pers_FirstName, NULL AS Pers_LastName, NULL AS Pers_PersonId, NULL AS Pers_PrimaryUserId, NULL AS Pers_SecTerr, NULL AS Pers_CreatedBy, NULL AS Pers_ChannelId, NULL AS Pers_Deleted, NULL AS Pers_CompanyId, NULL AS Pers_AccountId, NULL AS Pers_LibraryDir, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_LibraryDir, Acc_AccountId, Acc_Name, Acc_PrimaryUserId, Acc_SecTerr, Acc_CreatedBy, Acc_ChannelId, NULL AS Acc_LibraryDir FROM vAccountEmail INNER JOIN Account ON ELink_RecordId = Acc_AccountId AND Acc_Deleted IS NULL LEFT JOIN Company ON Acc_CompanyId = Comp_CompanyId
+Error Message: Failed to run query: CREATE VIEW vUserContacts AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, UserContacts.*, vPersonPE.*, Users.*, vCompanyPE.*, Person_Link.*, Address.* FROM vPersonPE INNER JOIN UserContacts ON UCnt_PersonID = Pers_PersonID AND UCnt_Deleted IS NULL INNER JOIN Users ON UCnt_UserID = User_UserID AND User_Deleted IS NULL LEFT JOIN Person_Link ON PeLi_PersonID = UCnt_PersonID AND PeLi_Type IS NULL AND PeLi_AccountId IS NULL AND PeLi_Deleted IS NULL LEFT JOIN vCompanyPE ON PeLi_CompanyID = Comp_CompanyID LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressID WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportUserContacts AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, UserContacts.*, vPersonPE.*, Users.*, vCompanyPE.*, Person_link.* FROM vPersonPE INNER JOIN UserContacts ON UCnt_PersonID = Pers_PersonID AND UCnt_Deleted IS NULL INNER JOIN Users ON User_UserID = UCnt_UserID AND User_Deleted IS NULL LEFT JOIN Person_Link ON PeLi_PersonID = UCnt_PersonID AND PeLi_Type IS NULL LEFT JOIN vCompanyPE ON PeLi_CompanyID = Comp_CompanyID WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vPhoneHome AS SELECT Phon_PhoneID, PLink_RecordId, Phon_CountryCode, Phon_AreaCode, Phon_Number FROM vPersonPhone WHERE (Phon_PhoneID IN (SELECT MAX(Phon_PhoneID) FROM vPersonPhone WHERE UPPER(PLink_Type) = 'HOME' GROUP BY PLink_RecordId))
+Error Message: Failed to run query: CREATE VIEW vPhoneMobile AS SELECT Phon_PhoneID, PLink_RecordId, Phon_CountryCode, Phon_AreaCode, Phon_Number FROM vPersonPhone WHERE (Phon_PhoneID IN (SELECT MAX(Phon_PhoneID) FROM vPersonPhone WHERE UPPER(PLink_Type) = 'MOBILE'  GROUP BY PLink_RecordId))
+Error Message: Failed to run query: CREATE VIEW vOutLookContacts AS SELECT CASE WHEN Pers_UpdatedDate > Addr_UpdatedDate AND Pers_UpdatedDate > Comp_UpdatedDate THEN Pers_UpdatedDate WHEN Addr_UpdatedDate > Pers_UpdatedDate AND (Comp_UpdatedDate IS NULL OR Addr_UpdatedDate > Comp_UpdatedDate) THEN Addr_UpdatedDate WHEN Comp_UpdatedDate > Pers_UpDatedDate AND (Addr_UpdatedDate IS NULL OR  Comp_UpdatedDate > Addr_UpdatedDate) THEN Comp_UpDatedDate ELSE Pers_Updateddate END AS UpdatedDate, Pers_PersonId AS ID, Pers_FirstName AS FirstName, Pers_MiddleName AS MiddleName, Pers_LastName AS LastName, Pers_Suffix AS Suffix, Comp_Name AS Company,comp_companyID, Addr_Address1 AS Street, Addr_Address2 as Street2, Addr_Address3 as Street3, Addr_Address4 as Street4, Addr_City AS City, Addr_State AS State, Addr_PostCode AS PostCode, Addr_Country AS Country, Pers_FaxCountryCode as BCFax, Pers_FaxAreaCode as BAFax, Pers_FaxNumber AS BFax, Pers_PhoneCountryCode as BCPhone, Pers_PhoneAreaCode as BAPhone, Pers_PhoneNumber AS BPhone, Pers_Department AS Dept, H.Phon_CountryCode AS HCPhone, H.Phon_AreaCode AS HAPhone, H.Phon_Number AS HPhone, M.Phon_CountryCode AS MCPhone, M.Phon_AreaCode AS MAPhone, M.Phon_Number AS MPhone, Pers_EmailAddress AS eMail, Pers_Salutation AS Title, Pers_Title AS JobTitle, Pers_Deleted AS IsDeleted, Pers_WebSite AS WebSite, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS CrmModifyingPerson,  COALESCE(Pers_UpdatedDate, Pers_CreatedDate) AS CrmModificationDate FROM vPersonPE LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN vPhoneHome H ON Pers_PersonID = H.PLink_RecordId LEFT JOIN vPhoneMobile M ON Pers_PersonId = M.PLink_RecordId LEFT JOIN Users ON User_UserID = COALESCE(Pers_UpdatedBy, Pers_CreatedBy)
+Error Message: Failed to run query: CREATE VIEW vOutLookAppointments AS SELECT Comm_UpdatedDate, Comm_CommunicationId AS ID, Comm_DateTime, Comm_ToDateTime, Comm_Note AS Details, Comm_Deleted AS IsDeleted, CmLi_Comm_UserId AS UserID, Comm_Status AS ItemStatus, Comm_Priority AS Priority, Comm_Type AS Type, Comm_NotifyDelta AS Notify, Comm_SecTerr, Comm_CreatedBy, Comm_ChannelId, Comm_Private AS Private, Comm_NotifyTime AS ReminderTime, Comm_OutlookID, Comm_MeetingID Pers_FirstName, Pers_LastName, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_ChannelId, RTRIM(Comm_Organizer) AS Comm_Organizer, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS CrmModifyingPerson,  COALESCE(Comm_UpdatedDate, Comm_CreatedDate) AS CrmModificationDate FROM Communication INNER JOIN Comm_Link ON  Comm_CommunicationId = CmLi_Comm_CommunicationId LEFT JOIN vPersonPE ON Pers_PersonID = CmLi_Comm_PersonID LEFT JOIN vCompanyPE ON Comp_CompanyID = CmLi_Comm_CompanyID LEFT JOIN Users ON User_UserID = COALESCE(Comm_UpdatedBy, Comm_CreatedBy) WHERE (UPPER(Comm_Type)='APPOINTMENT' OR UPPER(Comm_Type)='TASK') AND Comm_RecurrenceID IS NULL AND Comm_TargetListID IS NULL AND Comm_CRMOnly IS NULL AND CmLi_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationLead AS SELECT Lead.*, vPersonPE.*, vCompanyPE.*, Users.*, Escalations.* FROM Lead LEFT JOIN Users ON Lead_AssignedUserId = User_UserId LEFT JOIN vPersonPE ON Lead_PrimaryPersonId = Pers_PersonId AND Pers_Deleted IS NULL LEFT JOIN vCompanyPE ON Lead_PrimaryCompanyId = Comp_CompanyId LEFT JOIN Escalations ON Lead_LeadId  = Escl_RecordID AND Escl_TableId = 59 AND Escl_Deleted IS NULL WHERE User_Deleted IS NULL AND Lead_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationOpportunity AS SELECT Opportunity.*, vPersonPE.*, vCompanyPE.*, Users.*, Escalations.* FROM Users INNER JOIN Opportunity ON Oppo_AssignedUserId = User_UserId AND Oppo_Deleted IS NULL LEFT JOIN vPersonPE ON Oppo_PrimaryPersonId = Pers_PersonId AND Pers_Deleted IS NULL LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyId = Comp_CompanyId LEFT JOIN Escalations ON Oppo_OpportunityId  = Escl_RecordID AND Escl_TableId = 10 AND Escl_Deleted IS NULL WHERE User_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationCompany AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS User_Name, vAddress.*, vPersonPE.*, vCompanyPE.*, Users.*, Escalations.* FROM vCompanyPE LEFT JOIN vAddress ON Comp_PrimaryAddressId = Addr_AddressId LEFT JOIN vPersonPE ON Comp_PrimaryPersonId = Pers_PersonId AND Pers_Deleted IS NULL LEFT JOIN Users ON Comp_PrimaryUserId = User_UserId LEFT JOIN Escalations ON Comp_companyId = Escl_RecordID AND Escl_TableId = 5 AND Escl_Deleted IS NULL WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationPerson AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS User_Name, RTRIM(ISNULL(Addr_Address1, '')) + '~' + RTRIM(ISNULL(Addr_Address2, '')) + '~' + RTRIM(ISNULL(Addr_Address3, '')) + '~' + RTRIM(ISNULL(Addr_Address4, '')) + '~' + RTRIM(ISNULL(Addr_Address5, '')) AS Addresses, vAddress.*, Users.*, vPersonPE.*, vCompanyPE.*, Escalations.* FROM vPersonPE LEFT JOIN vAddress ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN Users ON Pers_PrimaryUserID = User_UserId LEFT JOIN Escalations ON Pers_PersonId  = Escl_RecordID AND Escl_TableId = 13 AND Escl_Deleted IS NULL WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vOutlookRecurringAppointments AS SELECT Comm_UpdatedDate, Comm_CommunicationId AS ID, Comm_DateTime, Comm_ToDateTime, Comm_Note AS Details, COALESCE(Comm_Deleted, Cmli_Deleted) AS IsDeleted, CmLi_Comm_UserId AS UserID, CmLi_UpdatedDate, CmLi_EntityId, CmLi_RecordId, Comm_Status AS ItemStatus, Comm_Priority AS Priority, Comm_Type AS Type, Comm_NotifyDelta AS Notify, Comm_Private AS Private, Comm_NotifyTime AS ReminderTime, Comm_OutlookID, Comm_MeetingID, Comm_CreatedDate, Comm_OriginalDatetime, Comm_OriginalToDateTime, Comm_Exception AS Exception, Comm_ChannelID, Comm_CreatedBy, Comm_SecTerr, Comp_ChannelId, Comp_CreatedBy, Comp_PrimaryUserId, Comp_Name, Pers_FirstName, Pers_LastName, Pers_SecTerr, Pers_ChannelId, Pers_PrimaryUserId, Pers_CreatedBy, Recu_RecurrenceID AS RecuID, Recu_Type AS RecuType, Recu_Interval AS RecuInterval, Recu_DayOfWeek AS RecuDayOfWeek, Recu_DayOfMonth AS RecuDayOfMonth, Recu_Instance AS RecuInstance, Recu_StartDateTime, Recu_EndDateTime, Recu_UpdatedDate, Recu_CreatedDate, Recu_Deleted AS RecuDeleted, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS CrmModifyingPerson, COALESCE(Comm_UpdatedDate, Comm_CreatedDate) AS CrmModificationDate FROM Communication INNER JOIN Comm_Link ON Comm_CommunicationId = CmLi_Comm_CommunicationId INNER JOIN Recurrence ON Comm_RecurrenceID = Recu_RecurrenceID AND Recu_SubType = 0 LEFT JOIN vPersonPE ON Pers_PersonID = CmLi_Comm_PersonID LEFT JOIN vCompanyPE ON Comp_CompanyID = CmLi_Comm_CompanyID LEFT JOIN Users ON User_UserId = COALESCE(Comm_UpdatedBy, Comm_CreatedBy) WHERE (UPPER(Comm_Type) = 'APPOINTMENT' OR UPPER(Comm_Type) = 'TASK') AND Comm_TargetListID IS NULL AND Comm_CRMOnly IS NULL
+Error Message: Failed to run query: CREATE VIEW vMailMerge AS SELECT Pers_PersonId, Comp_CompanyId, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Pers_Salutation, Pers_LastName, Pers_FirstName, Pers_MiddleName, Pers_Title, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_EmailAddress, Comp_Name, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId FROM vPersonPE LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vMailMergeCompany AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Pers_PersonId, Pers_Salutation, Pers_LastName, Pers_FirstName, Pers_MiddleName, Pers_Title, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_EmailAddress, Comp_Name, Comp_CompanyId, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId FROM vCompanyPE LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId LEFT JOIN vPersonPE ON Comp_PrimaryPersonId = Pers_PersonId WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportCompany AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, vCompanyPE.*, Marketing.*, vPersonPE.*, Address.*, (SELECT CASE WHEN CompanyCount = 0 or AccountCount = 0 THEN NULL ELSE 'Y' END FROM vSharedAddress WHERE vSharedAddress.AdLi_AddressId = Addr_AddressId) as Addr_IsSharedAddress FROM vCompanyPE LEFT JOIN vPersonPE ON Comp_PrimaryPersonId = Pers_PersonID LEFT JOIN Marketing ON Mrkt_CompanyId = Comp_CompanyId AND Mrkt_Deleted IS NULL LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportLead AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, Lead.*, DataUpload.*, vCompanyPE.*, vPersonPE.* FROM LEAD LEFT JOIN DataUpload ON Lead_DataUpLoadID = DaUp_DataUploadId LEFT JOIN vCompanyPE ON Lead_PrimaryCompanyID = Comp_CompanyId LEFT JOIN vPersonPE ON Lead_PrimaryPersonID = Pers_PersonId WHERE Lead_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityCompany AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, vCompanyPE.*, Account.*, vPersonPE.*, Address.* FROM vCompanyPE LEFT JOIN Account ON Comp_PrimaryAccountId = Acc_AccountId LEFT JOIN vPersonPE ON Comp_PrimaryPersonID = Pers_PersonID LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityPerson AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, vPersonPE.*, vCompanyPE.*, Account.*, Address.* FROM vPersonPE LEFT JOIN vCompanyPE ON Pers_CompanyID = Comp_CompanyId LEFT JOIN Account ON Pers_AccountId = Acc_AccountId LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityPhoneEmailCompany AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, vCompanyPE.*, vPersonPE.* FROM vCompanyPE LEFT JOIN vPersonPE ON Comp_PrimaryPersonID = Pers_PersonID WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vTargetListPerson AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, vPersonPE.*, vCompanyPE.*, Address.* FROM vPersonPE LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vTargetListContacts AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, vPersonPE.*, vCompanyPE.*, Address.*, Ucnt_UserID, Ucnt_PersonID FROM vPersonPE LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN UserContacts ON Ucnt_PersonId = Pers_PersonId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportCallList AS SELECT RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS User_FullName, CallList.*, vPersonPE.*, WaveItems.*, vCompanyPE.*, Lead.*, Users.*, TerritoryProfiles.tpro_Description
+FROM CallList LEFT JOIN vPersonPE ON LCall_PersonID = Pers_PersonID 
+LEFT JOIN WaveItems ON LCall_WaveItemID = WaIt_WaveItemID 
+LEFT JOIN vCompanyPE ON Pers_CompanyID = comp_companyID 
+LEFT JOIN Users ON LCall_contacted = User_UserId 
+LEFT JOIN Lead ON LCall_LeadID = Lead_LeadID 
+LEFT JOIN TerritoryProfiles on tpro_profileid = User_TerritoryProfile
+WHERE LCall_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityAddress AS SELECT Address.*, Address_Link.*, vCompanyPE.*, Account.*, vPersonPE.* FROM Address_Link LEFT JOIN Address ON AdLi_AddressId = Addr_AddressId LEFT JOIN vCompanyPE ON AdLi_CompanyId = Comp_CompanyId LEFT JOIN Account ON AdLi_AccountId = Acc_AccountId LEFT JOIN vPersonPE ON AdLi_PersonID = Pers_PersonId WHERE AdLi_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vTargetListProduct AS SELECT DISTINCT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Pers_PersonID, Pers_CompanyID, Pers_PrimaryAddressID, Pers_PrimaryUserID, Pers_Salutation, Pers_FirstName, Pers_LastName, Pers_MiddleName, Pers_Suffix, Pers_Gender, Pers_Title, Pers_TitleCode, Pers_Department, Pers_Status, Pers_Source, Pers_Territory, Pers_Website, Pers_MailRestriction, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_EmailAddress, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_LibraryDir, Pers_ChannelID, Pers_UploadDate, Pers_Deleted, Pers_SecTerr, Pers_CreatedBy, Comp_CompanyID, Comp_PrimaryPersonID, Comp_PrimaryAddressID, Comp_PrimaryUserID, Comp_Name, Comp_Type, Comp_Status, Comp_Source, Comp_Territory, Comp_Revenue, Comp_Employees, Comp_Sector, Comp_IndCode, Comp_Website, Comp_MailRestriction, Comp_PhoneCountryCode, Comp_PhoneAreaCode, Comp_PhoneNumber, Comp_FaxCountryCode, Comp_FaxAreaCode, Comp_FaxNumber, Comp_EmailAddress, Comp_LibraryDir, Comp_ChannelID, Comp_SecTerr, Comp_UploadDate, Comp_CreatedBy, Addr_AddressID, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode, Prod_Name, Oppo_ChannelID, Oppo_CreatedBy, Oppo_SecTerr, Oppo_AssignedUserId FROM vPersonPE LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN Opportunity ON Pers_PersonId = Oppo_PrimaryPersonId LEFT JOIN OpportunityItem ON OpIt_OpportunityId = Oppo_OpportunityId LEFT JOIN Products ON Prod_ProductId = OpIt_ProductId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vTargetListCompany AS SELECT epd_pers.epd_PhoneFullNumber AS Pers_PhoneFullNumber, epd_pers.epd_FaxFullNumber AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(epd_pers.epd_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(epd_pers.epd_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(epd_pers.epd_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Pers_PersonId, Pers_CompanyId, Pers_PrimaryAddressId, Pers_PrimaryUserId, Pers_Salutation, Pers_FirstName, Pers_LastName, Pers_MiddleName, Pers_Suffix, Pers_Gender, Pers_Title, Pers_TitleCode, Pers_Department, Pers_Status, Pers_Source, Pers_Territory, Pers_WebSite, Pers_MailRestriction, epd_pers.epd_PhoneCountryCode as Pers_PhoneCountryCode, epd_pers.epd_PhoneAreaCode as Pers_PhoneAreaCode, epd_pers.epd_PhoneNumber as Pers_PhoneNumber, epd_pers.epd_EmailAddress as Pers_EmailAddress, epd_pers.epd_FaxCountryCode as Pers_FaxCountryCode, epd_pers.epd_FaxAreaCode as Pers_FaxAreaCode, epd_pers.epd_FaxNumber as Pers_FaxNumber, Pers_LibraryDir, Pers_ChannelID, Pers_UploadDate, Pers_SecTerr, Pers_Deleted, Pers_CreatedBy, Comp_CompanyId, Comp_PrimaryPersonId, Comp_PrimaryAddressId, Comp_PrimaryUserId, Comp_Name, Comp_Type, Comp_Status, Comp_Source, Comp_Territory, Comp_Revenue, Comp_Employees, Comp_Sector, Comp_IndCode, Comp_WebSite, Comp_MailRestriction, epd_comp.epd_PhoneCountryCode as Comp_PhoneCountryCode, epd_comp.epd_PhoneAreaCode as Comp_PhoneAreaCode, epd_comp.epd_PhoneNumber as Comp_PhoneNumber, epd_comp.epd_FaxCountryCode as Comp_FaxCountryCode, epd_comp.epd_FaxAreaCode as Comp_FaxAreaCode, epd_comp.epd_FaxNumber as Comp_FaxNumber, epd_comp.epd_EmailAddress as Comp_EmailAddress, Comp_LibraryDir, Comp_ChannelID, Comp_SecTerr, Comp_CreatedBy, Comp_UploadDate, Addr_AddressId, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, (SELECT CASE WHEN CompanyCount = 0 or AccountCount = 0 THEN NULL ELSE 'Y' END FROM vSharedAddress WHERE vSharedAddress.AdLi_AddressId = Addr_AddressId) as Addr_IsSharedAddress, Addr_Country, Addr_PostCode FROM Company LEFT JOIN CRMEmailPhoneData epd_comp ON epd_comp.epd_EntityID = 5 AND epd_comp.epd_RecordID = Comp_CompanyID LEFT JOIN Person ON (Comp_PrimaryPersonID = Pers_PersonID) AND (Pers_Deleted IS NULL)LEFT JOIN CRMEmailPhoneData epd_pers ON epd_pers.epd_EntityID = 13 AND epd_pers.epd_RecordID = Pers_PersonID LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportCases AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, Cases.*, Comp_Name, Comp_CompanyId, Comp_EmailAddress, Comp_SecTerr, Comp_CreatedBy, Comp_PrimaryUserID, Pers_EmailAddress, Pers_SecTerr, Pers_CreatedBy, Pers_PersonId, Pers_PrimaryUserID, Chan_Description, Prod_Name, Comp_ChannelID, Pers_ChannelID FROM Cases LEFT JOIN vPersonPE ON Case_PrimaryPersonID = Pers_PersonID LEFT JOIN vCompanyPE ON Case_PrimaryCompanyID = Comp_CompanyId LEFT JOIN Channel ON Chan_ChannelId = Case_ChannelId LEFT JOIN Products ON Case_ProductId = Prod_ProductId WHERE Case_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportCommunication AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, CmLi_Comm_UserId AS Comm_UserID, CmLi_Comm_UserID, CmLi_Comm_CompanyID, CmLi_EntityId, CmLi_RecordId, Communication.*, Comp_CompanyId, Comp_Name, Comp_Territory, Comp_EmailAddress, Comp_SecTerr, Comp_CreatedBy, Comp_PrimaryUserID, Pers_Title, Pers_SecTerr, Pers_PersonId, Pers_CreatedBy, Pers_EmailAddress, Pers_PrimaryUserID, Comp_ChannelID, Pers_ChannelID, Comm_CaseID AS Case_CaseID, Comm_OpportunityID AS Oppo_OpportunityID, CmLi_Comm_AccountId AS Acc_AccountId FROM Communication LEFT JOIN Comm_Link ON Comm_CommunicationId = CmLi_Comm_CommunicationId LEFT JOIN vPersonPE ON CmLi_Comm_PersonID = Pers_PersonID LEFT JOIN vCompanyPE ON CmLi_Comm_CompanyID = Comp_CompanyId WHERE Comm_Deleted IS NULL AND CmLi_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportOpportunity AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, Opportunity.*, Comp_Name, Comp_Territory, Comp_EmailAddress, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_PrimaryUserID, Terr_Caption, Pers_Title, Pers_EmailAddress, Pers_SecTerr, Pers_CreatedBy, Pers_PersonId, Pers_PrimaryUserID, Chan_Description, Comp_ChannelID,(SELECT CAST(CAST(Parm_Value AS NCHAR) AS INTEGER) FROM Custom_SysParams WHERE Parm_Name = 'BaseCurrency') AS Oppo_WeightedForecast_CID, Pers_ChannelID, ((Oppo_Forecast / Oppo_Forecast_Currency.Curr_Rate) * Oppo_Certainty / 100) AS Oppo_WeightedForecast, Oppo_PrimaryAccountId AS Acc_AccountId FROM Opportunity LEFT JOIN vPersonPE ON Oppo_PrimaryPersonID = Pers_PersonID LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyID = Comp_CompanyId LEFT JOIN Territories ON Oppo_SecTerr = Terr_TerritoryId LEFT JOIN Channel ON Chan_ChannelId = Oppo_ChannelId LEFT JOIN Currency Oppo_Forecast_Currency ON Oppo_Forecast_CID = Oppo_Forecast_Currency.Curr_CurrencyID WHERE Oppo_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportPerson AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, vPersonPE.*, Address.*, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_Name, Comp_PrimaryUserID, Comp_ChannelID FROM vPersonPE LEFT JOIN Company ON Pers_CompanyId = Comp_CompanyId LEFT JOIN Address ON Addr_AddressId = Pers_PrimaryAddressId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportCaseProgress AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, CaseProgress.*, Case_PrimaryCompanyID, Case_Description, Case_CustomerRef, Case_SerialNumber, Case_Product, Case_ReferenceID, Case_ProductArea, Case_FoundVer, Case_SecTerr, Case_ProductID, Comp_Name, Comp_CompanyID, Comp_EmailAddress, Comp_SecTerr, Comp_CreatedBy, Comp_PrimaryUserID, Comp_ChannelID, Pers_EmailAddress, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelID, Pers_PersonID, Pers_PrimaryUserID, Chan_Description, Prod_Name FROM CaseProgress INNER JOIN Cases ON Cases.Case_CaseId = CaseProgress.Case_CaseId AND Cases.Case_Deleted IS NULL LEFT JOIN vPersonPE ON Cases.Case_PrimaryPersonID = Pers_PersonID LEFT JOIN vCompanyPE ON Cases.Case_PrimaryCompanyID = Comp_CompanyId LEFT JOIN Channel ON Chan_ChannelId = Cases.Case_ChannelId LEFT JOIN Products ON Case_ProductId = Prod_ProductId WHERE Cases.Case_Deleted IS NULL AND Cases.Case_CaseId = CaseProgress.Case_CaseId
+Error Message: Failed to run query: CREATE VIEW vReportSLACasesViolation AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, Cases.*, Comp_Name, Comp_CompanyId, Comp_EmailAddress, Comp_SecTerr, Comp_CreatedBy, Comp_PrimaryUserID, Pers_EmailAddress, Pers_SecTerr, Pers_CreatedBy, Pers_PersonId, Pers_PrimaryUserID, Chan_Description, Prod_Name, Comp_ChannelID, Pers_ChannelID FROM Cases LEFT JOIN vPersonPE ON Case_PrimaryPersonID = Pers_PersonID LEFT JOIN vCompanyPE ON Case_PrimaryCompanyID = Comp_CompanyId LEFT JOIN Channel ON Chan_ChannelId = Case_ChannelId LEFT JOIN Products ON Case_ProductId = Prod_ProductId WHERE (Case_Status <> 'Closed' AND GETDATE() > Case_SLACloseBy) AND Case_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityPhoneEmailPerson AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, vPersonPE.*, vCompanyPE.* FROM vPersonPE LEFT JOIN vCompanyPE ON Pers_CompanyID = Comp_CompanyId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vOfficerAgent
+AS 
+SELECT * 
+FROM azLive.dbo.vwLUOfficerAgent
+Error Message: Failed to run query: CREATE VIEW vPortfolioManagementALL 
+AS 
+
+SELECT     dbo.vOpportunityALL.oppo_entrycode, dbo.vOpportunityALL.Oppo_Description, dbo.vOpportunityALL.oppo_glcompany, oppo_GuaranteeDate,  dbo.vOpportunityALL.oppo_loanadministrator,
+                      dbo.vOpportunityALL.oppo_funder, dbo.vOpportunityALL.oppo_amountappliedfor_CID, dbo.vOpportunityALL.oppo_officeragent, 
+                      dbo.vPayouts.pout_amount, dbo.vPayouts.pout_amount_CID, dbo.vPayouts.pout_descr, dbo.vOpportunityALL.Oppo_Stage, 
+                      CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)  FROM  vPayouts p WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_primarycompanyid WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_primarycompanyid ELSE NULL END AS oppo_primarycompanyid,
+CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_ApprovalDate WHEN isnull(pout_loanid, 0) = 0 THEN dbo.vOpportunityALL.oppo_ApprovalDate ELSE NULL 
+                      END AS oppo_ApprovalDate,
+CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.Oppo_Opened WHEN isnull(pout_loanid, 0) = 0 THEN dbo.vOpportunityALL.Oppo_Opened ELSE NULL 
+                      END AS Oppo_Opened, 
+CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_firstinstallment WHEN isnull(pout_loanid, 0) = 0 THEN dbo.vOpportunityALL.oppo_firstinstallment ELSE NULL 
+                      END AS oppo_firstinstallment, 
+CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_debtcover WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_debtcover ELSE NULL END AS oppo_debtcover,
+CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_yieldinvestment WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_yieldinvestment ELSE NULL END AS oppo_yieldinvestment, 
+CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_interest WHEN isnull(pout_loanid, 0) = 0 
+						THEN dbo.vOpportunityALL.oppo_interest ELSE NULL END AS oppo_interest,
+                      CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_debtequity WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_debtequity ELSE NULL END AS oppo_debtequity, CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_primarypersonid WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_primarypersonid ELSE NULL END AS oppo_primarypersonid, CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_amountappliedfor WHEN isnull(pout_loanid, 0) = 0 THEN dbo.vOpportunityALL.oppo_amountappliedfor ELSE NULL 
+                      END AS oppo_amountappliedfor, CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_grace WHEN isnull(pout_loanid, 0) = 0 THEN dbo.vOpportunityALL.oppo_grace ELSE NULL END AS oppo_grace, 
+                      CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_approvalauthority WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_approvalauthority ELSE NULL END AS oppo_approvalauthority, CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL THEN datediff(mm, oppo_ApprovalDate, oppo_opened) 
+                      WHEN isnull(pout_loanid, 0) = 0 THEN datediff(mm, oppo_ApprovalDate, oppo_opened) ELSE NULL END AS rptf_RegistrationTime, 
+                      CASE WHEN pout_loanid =
+                          (SELECT     MIN(pout_loanid)
+                            FROM          vPayouts p
+                            WHERE      p.pout_assignedloanid = oppo_opportunityid) AND pout_deleted IS NULL 
+                      THEN dbo.vOpportunityALL.oppo_loantovalue WHEN isnull(pout_loanid, 0) 
+                      = 0 THEN dbo.vOpportunityALL.oppo_loantovalue ELSE NULL END AS oppo_loantovalue,
+			dbo.vProperty.prop_address1, dbo.vProperty.prop_suburb, dbo.vProperty.prop_city, dbo.vProperty.prop_totalresidentialunits,  dbo.vOpportunityALL.oppo_registrationdate
+FROM         dbo.vOpportunityALL LEFT OUTER JOIN
+                      dbo.vPayouts ON dbo.vOpportunityALL.Oppo_OpportunityId = dbo.vPayouts.pout_assignedloanid
+			LEFT OUTER JOIN
+				dbo.vProperty ON dbo.vOpportunityALL.oppo_Property = dbo.vProperty.prop_Propertyid
+Error Message: Failed to run query: CREATE VIEW vPortfolioManagementTUHF
+AS 
+ 
+SELECT     oppo_entrycode, Oppo_Description, oppo_glcompany,  oppo_debtcover, oppo_yieldinvestment,oppo_interest, oppo_debtequity, oppo_interestselection,
+oppo_primarycompanyid 
+, oppo_primarypersonid,   oppo_loanadministrator,
+oppo_amountappliedfor, oppo_amountappliedfor_cid, 
+Oppo_Opened, oppo_firstinstallment, oppo_grace, 
+                      oppo_ApprovalDate, oppo_approvalauthority, 
+datediff(mm, oppo_ApprovalDate, oppo_opened) as rptf_RegistrationTime, oppo_officeragent, 
+Oppo_Stage, oppo_loantovalue 
+FROM         dbo.vOpportunityTUHF 
+where oppo_deleted is null
+Error Message: Failed to run query: CREATE VIEW vLoanContract
+AS 
+SELECT     loca_LoancontractId, loca_Description, loca_CreatedBy, loca_CreatedDate, loca_UpdatedBy, loca_UpdatedDate, loca_TimeStamp, loca_Deleted, 
+                      loca_workflowid, loca_loanId, loca_Date, loca_Revision, loca_note, loca_Status, loca_Balance, loca_Period, loca_GlobalIndex, loca_GlobalType
+FROM         dbo.LoanContract
+WHERE     loca_Deleted IS NULL AND loca_Status not like 'Inactive'
+Error Message: Failed to run query: CREATE VIEW vKeywordSearchListOpportunity AS SELECT        vPersonPE.Pers_EmailAddress, vPersonPE.Pers_PhoneCountryCode, vPersonPE.Pers_PhoneAreaCode, vPersonPE.Pers_PhoneNumber, 
+                         vPersonPE.Pers_FaxCountryCode, vPersonPE.Pers_FaxAreaCode, vPersonPE.Pers_FaxNumber, vPersonPE.Pers_PersonId, vPersonPE.Pers_CompanyId, 
+                         vPersonPE.Pers_PrimaryAddressId, vPersonPE.Pers_PrimaryUserId, vPersonPE.Pers_Salutation, vPersonPE.Pers_FirstName, vPersonPE.Pers_LastName, 
+                         vPersonPE.Pers_MiddleName, vPersonPE.Pers_Suffix, vPersonPE.Pers_Gender, vPersonPE.Pers_Title, vPersonPE.Pers_TitleCode, vPersonPE.Pers_Department, 
+                         vPersonPE.Pers_Status, vPersonPE.Pers_Source, vPersonPE.Pers_Territory, vPersonPE.Pers_WebSite, vPersonPE.Pers_MailRestriction, 
+                         vPersonPE.Pers_CreatedBy, vPersonPE.Pers_CreatedDate, vPersonPE.Pers_UpdatedBy, vPersonPE.Pers_UpdatedDate, vPersonPE.Pers_TimeStamp, 
+                         vPersonPE.Pers_Deleted, vPersonPE.Pers_LibraryDir, vPersonPE.Pers_SegmentID, vPersonPE.Pers_ChannelID, vPersonPE.Pers_UploadDate, 
+                         vPersonPE.pers_SecTerr, vPersonPE.Pers_WorkflowId, vPersonPE.pers_code, vPersonPE.pers_idno, vPersonPE.pers_reference, vPersonPE.pers_maritialstatus, 
+                         vPersonPE.pers_dependants, vPersonPE.pers_occupation, vPersonPE.pers_employment, vPersonPE.pers_nationality, vPersonPE.pers_dateofbirth, 
+                         vPersonPE.pers_entitytype, vPersonPE.pers_fica, vPersonPE.pers_role, vPersonPE.pers_incometax, vPersonPE.pers_credithistory, vPersonPE.pers_AZEntityID, 
+                         vPersonPE.pers_azfoccupation, vPersonPE.pers_bee, vPersonPE.pers_VatNo, vPersonPE.pers_ficacheck, vPersonPE.pers_nca, vPersonPE.pers_statementcycle, 
+                         vPersonPE.Pers_AccountId, vPersonPE.pers_intforeignid, vPersonPE.pers_intid, vPersonPE.pers_intlastsyncdate, vPersonPE.pers_promote, 
+                         vPersonPE.pers_ConflictResDate, vPersonPE.pers_Languagepref, vPersonPE.pers_incomeamount, vPersonPE.pers_incomeamount_CID, 
+                         vPersonPE.pers_annualturnover, vPersonPE.pers_annualturnover_CID, vPersonPE.pers_assetvalue, vPersonPE.pers_assetvalue_CID, 
+                         vPersonPE.pers_Assetsplusturnover, vPersonPE.pers_Assetsplusturnover_CID, vPersonPE.pers_threshold, vPersonPE.pers_marketing, vPersonPE.pers_PRC, 
+                         vPersonPE.pers_Risk, vPersonPE.pers_dedupe_timestamp, vPersonPE.pers_underwriter, vPersonPE.pers_broker, vPersonPE.pers_InsuranceRisk, 
+                         vPersonPE.pers_departmentcode, vPersonPE.pers_lastfinancial, vPersonPE.pers_taxyearend, vPersonPE.pers_race, vPersonPE.pers_statementdelivery, 
+                         vPersonPE.pers_CheckedbyFicaOfficer, vPersonPE.pers_borrowertype, vPersonPE.pers_alias, vPersonPE.pers_SMS, vPersonPE.pers_mktconsent, 
+                         vPersonPE.pers_idtype, vPersonPE.pers_packs, vPersonPE.Pers_OptOut, Opportunity.Oppo_OpportunityId, Opportunity.Oppo_PrimaryCompanyId, 
+                         Opportunity.Oppo_PrimaryPersonId, Opportunity.Oppo_AssignedUserId, Opportunity.Oppo_ChannelId, Opportunity.Oppo_Description, Opportunity.Oppo_Type, 
+                         Opportunity.Oppo_Product, Opportunity.Oppo_Source, Opportunity.Oppo_Note, Opportunity.Oppo_CustomerRef, Opportunity.Oppo_Opened, 
+                         Opportunity.Oppo_Closed, Opportunity.Oppo_Status, Opportunity.Oppo_Stage, Opportunity.Oppo_Forecast, Opportunity.Oppo_Certainty, Opportunity.Oppo_Priority, 
+                         Opportunity.Oppo_TargetClose, Opportunity.Oppo_CreatedBy, Opportunity.Oppo_CreatedDate, Opportunity.Oppo_UpdatedBy, Opportunity.Oppo_UpdatedDate, 
+                         Opportunity.Oppo_TimeStamp, Opportunity.Oppo_Deleted, Opportunity.Oppo_Total, Opportunity.Oppo_NotifyTime, Opportunity.Oppo_SMSSent, 
+                         Opportunity.Oppo_WaveItemId, Opportunity.Oppo_SegmentID, Opportunity.Oppo_SecTerr, Opportunity.Oppo_WorkflowId, Opportunity.Oppo_LeadID, 
+                         Opportunity.Oppo_Forecast_CID, Opportunity.Oppo_Total_CID, Opportunity.oppo_scenario, Opportunity.oppo_decisiontimeframe, Opportunity.oppo_Currency, 
+                         Opportunity.oppo_TotalOrders_CID, Opportunity.oppo_TotalOrders, Opportunity.oppo_totalQuotes_CID, Opportunity.oppo_totalQuotes, 
+                         Opportunity.oppo_NoDiscAmtSum, Opportunity.oppo_NoDiscAmtSum_CID, Opportunity.oppo_entrycode, Opportunity.oppo_loancode, Opportunity.oppo_Usage, 
+                         Opportunity.oppo_indicator, Opportunity.oppo_amountappliedfor, Opportunity.oppo_amountappliedfor_CID, Opportunity.oppo_units, 
+                         Opportunity.oppo_firstinstallment, Opportunity.oppo_loanperiod, Opportunity.oppo_capitalborrowed, Opportunity.oppo_capitalborrowed_CID, 
+                         Opportunity.oppo_fixedinterestperiod, Opportunity.oppo_interestrate, Opportunity.oppo_paymentmethod, Opportunity.oppo_officeragent, Opportunity.oppo_funder, 
+                         Opportunity.oppo_attorney, Opportunity.oppo_customertype, Opportunity.oppo_grace, Opportunity.oppo_property, Opportunity.oppo_consistencychecked, 
+                         Opportunity.oppo_feasibilityassessment, Opportunity.oppo_bondattorney, Opportunity.oppo_glcompany, Opportunity.oppo_period, Opportunity.oppo_interest, 
+                         Opportunity.oppo_creditcheck, Opportunity.oppo_character, Opportunity.oppo_proposal, Opportunity.oppo_sitevisit, Opportunity.oppo_taxyearend, 
+                         Opportunity.oppo_lastfinancial, Opportunity.oppo_linkedtoprime, Opportunity.oppo_absinterestrate, Opportunity.oppo_loantovalue, Opportunity.oppo_debtcover, 
+                         Opportunity.oppo_yieldinvestment, Opportunity.oppo_debtequity, Opportunity.oppo_ficaemail, Opportunity.oppo_contactclient, Opportunity.oppo_finviability, 
+                         Opportunity.oppo_docstorage, Opportunity.oppo_doccompliance, Opportunity.oppo_docrights, Opportunity.oppo_docconditions, Opportunity.oppo_loanverified, 
+                         Opportunity.oppo_ceocheck, Opportunity.oppo_finalaccount, Opportunity.oppo_ceoemail, Opportunity.oppo_drawdowndate, Opportunity.oppo_loanperiodm, 
+                         Opportunity.oppo_ApprovalDate, Opportunity.oppo_approvalauthority, Opportunity.oppo_GuaranteeDate, Opportunity.oppo_applicationdate, 
+                         Opportunity.oppo_interestselection, Opportunity.oppo_originator, Opportunity.oppo_loanadministrator, Opportunity.oppo_amountdef, 
+                         Opportunity.oppo_amountdef_CID, Opportunity.oppo_buildingvalu, Opportunity.oppo_buildingvalu_CID, Opportunity.oppo_buildinsure, 
+                         Opportunity.oppo_buildinsure_CID, Opportunity.oppo_capinterest, Opportunity.oppo_capinterest_CID, Opportunity.oppo_ceosignature, 
+                         Opportunity.oppo_clearanceexpiry, Opportunity.oppo_collateddate, Opportunity.oppo_details, Opportunity.oppo_docsafekeepingnote, Opportunity.oppo_docscollated, 
+                         Opportunity.oppo_expecteddate, Opportunity.oppo_guarantee, Opportunity.oppo_instalamount, Opportunity.oppo_instalamount_CID, 
+                         Opportunity.oppo_lodgementletterdate, Opportunity.oppo_preregconditions, Opportunity.oppo_preregmet, Opportunity.oppo_readreceiptread, 
+                         Opportunity.oppo_replacevalue, Opportunity.oppo_replacevalue_CID, Opportunity.oppo_oppo_receiveddate, Opportunity.oppo_receiveddate, 
+                         Opportunity.oppo_totalfees, Opportunity.oppo_totalfees_CID, Opportunity.oppo_intuthuko, Opportunity.oppo_ownersequity, Opportunity.Oppo_LoanChecksId, 
+                         Opportunity.oppo_sofnote, Opportunity.oppo_coapplicant, Opportunity.oppo_buildingowned, Opportunity.oppo_prerefurb, Opportunity.oppo_prereg, 
+                         Opportunity.oppo_prefinaldd, Opportunity.oppo_fundbreakdown, Opportunity.oppo_duedate, Opportunity.oppo_duedateoptions, Opportunity.oppo_totalpayable, 
+                         Opportunity.oppo_totalpayable_CID, Opportunity.oppo_DocsExecStored, Opportunity.oppo_Seasoning, Opportunity.oppo_NCArate, Opportunity.oppo_NCAPeriod, 
+                         Opportunity.oppo_RefurbPeriod, Opportunity.oppo_FixedIntRate, Opportunity.oppo_InterestType, Opportunity.Oppo_PrimaryAccountId, Opportunity.oppo_prccapture, 
+                         Opportunity.oppo_costtocompletion, Opportunity.oppo_program, Opportunity.oppo_quality, Opportunity.oppo_quantity, Opportunity.oppo_prc, 
+                         Opportunity.oppo_construction, Opportunity.oppo_drawdownphase, Opportunity.oppo_withdrawreason, Opportunity.oppo_pendingreason, 
+                         Opportunity.oppo_electricalcert, Opportunity.oppo_firecert, Opportunity.oppo_liftcert, Opportunity.oppo_prcname, Opportunity.oppo_estcompletedate, 
+                         Opportunity.oppo_finaldrawdowndate, Opportunity.oppo_changeprcreason, Opportunity.oppo_prcreportreceived, Opportunity.oppo_registrationdate, 
+                         Opportunity.oppo_externalprc, Opportunity.oppo_masterloanlink, Opportunity.oppo_loantype, Opportunity.oppo_penultimatedrawdown, Opportunity.oppo_subloan, 
+                         Opportunity.oppo_subloanid, Opportunity.oppo_masterloanid, Opportunity.oppo_pscletterdone, Opportunity.oppo_finalddconfirmed, 
+                         Opportunity.oppo_penultimateddconfirmed, Opportunity.oppo_AuditReport, Opportunity.oppo_insurancepremium, Opportunity.oppo_insurancepremium_CID, 
+                         Opportunity.oppo_totalsub, OpportunityProgress.oppo_progressnote, Opportunity.oppo_rentupconfirmed, Opportunity.oppo_BondID, Opportunity.oppo_amountrequired, 
+                         Opportunity.oppo_amountrequired_CID, Opportunity.oppo_sourceduedate, Opportunity.oppo_aa, Opportunity.oppo_Drawdownformreceived, 
+                         Opportunity.oppo_CompliancePeriod, Opportunity.oppo_ComplianceRateMargin, Opportunity.oppo_amountavailable, Opportunity.oppo_amountavailable_CID, 
+                         Opportunity.oppo_drawdownamountrequest, Opportunity.oppo_drawdownamountrequest_CID, Opportunity.oppo_valuationmethod, Opportunity.oppo_bankid, 
+                         Opportunity.oppo_correspondence, Opportunity.oppo_ddrequested, Opportunity.oppo_ingrace, Opportunity.oppo_insuranceinplace, 
+                         Opportunity.oppo_loanmovedtodrawdown, Opportunity.oppo_suspendinstalments, Opportunity.oppo_penaltyinteresttype, Opportunity.oppo_branch, 
+                         Opportunity.oppo_refurbishmentperiod, Opportunity.oppo_facilityamount, Opportunity.oppo_bfdetail2, Opportunity.oppo_bfloanperiodselect, 
+                         Opportunity.oppo_purpose, Opportunity.oppo_bfdetail1, Opportunity.oppo_repayment, Opportunity.oppo_bfsaleprice, Opportunity.oppo_bfrepaymentobligations, 
+                         Opportunity.oppo_bfproceeds, Opportunity.oppo_ficaissueddate, Opportunity.oppo_ficavaliddate, vCompanyPE.Comp_EmailAddress, 
+                         vCompanyPE.Comp_PhoneCountryCode, vCompanyPE.Comp_PhoneAreaCode, vCompanyPE.Comp_PhoneNumber, vCompanyPE.Comp_FaxCountryCode, 
+                         vCompanyPE.Comp_FaxAreaCode, vCompanyPE.Comp_FaxNumber, vCompanyPE.Comp_CompanyId, vCompanyPE.Comp_PrimaryPersonId, 
+                         vCompanyPE.Comp_PrimaryAddressId, vCompanyPE.Comp_PrimaryUserId, vCompanyPE.Comp_Name, vCompanyPE.Comp_Type, vCompanyPE.Comp_Status, 
+                         vCompanyPE.Comp_Source, vCompanyPE.Comp_Territory, vCompanyPE.Comp_Revenue, vCompanyPE.Comp_Employees, vCompanyPE.Comp_Sector, 
+                         vCompanyPE.Comp_IndCode, vCompanyPE.Comp_WebSite, vCompanyPE.Comp_MailRestriction, vCompanyPE.Comp_CreatedBy, vCompanyPE.Comp_CreatedDate, 
+                         vCompanyPE.Comp_UpdatedBy, vCompanyPE.Comp_UpdatedDate, vCompanyPE.Comp_TimeStamp, vCompanyPE.Comp_Deleted, vCompanyPE.Comp_LibraryDir, 
+                         vCompanyPE.Comp_SegmentID, vCompanyPE.Comp_ChannelID, vCompanyPE.Comp_SecTerr, vCompanyPE.Comp_WorkflowId, vCompanyPE.Comp_UploadDate, 
+                         vCompanyPE.comp_SLAId, vCompanyPE.comp_code, vCompanyPE.comp_regno, vCompanyPE.comp_reference, vCompanyPE.comp_fica, 
+                         vCompanyPE.comp_sndelivery, vCompanyPE.comp_mail, vCompanyPE.comp_auditor, vCompanyPE.comp_incometax, vCompanyPE.comp_credithistory, 
+                         vCompanyPE.comp_AZEntityID, vCompanyPE.comp_bee, vCompanyPE.comp_VatNo, vCompanyPE.comp_auditnumber, vCompanyPE.comp_auditperson, 
+                         vCompanyPE.comp_nca, vCompanyPE.comp_tuhfcompany, vCompanyPE.comp_azGLCompanyId, vCompanyPE.comp_ncrnumber, vCompanyPE.comp_NCR, 
+                         vCompanyPE.comp_accpaccompany, vCompanyPE.comp_statementcycle, vCompanyPE.Comp_PrimaryAccountId, vCompanyPE.comp_intforeignid, 
+                         vCompanyPE.comp_intid, vCompanyPE.comp_intlastsyncdate, vCompanyPE.comp_promote, vCompanyPE.comp_annualturnover, 
+                         vCompanyPE.comp_annualturnover_CID, vCompanyPE.comp_assetvalue, vCompanyPE.comp_assetvalue_CID, vCompanyPE.comp_threshold, 
+                         vCompanyPE.comp_assetsplusturnover, vCompanyPE.comp_assetsplusturnover_CID, vCompanyPE.comp_risk, vCompanyPE.comp_prc, 
+                         vCompanyPE.comp_dedupe_timestamp, vCompanyPE.comp_accpacorgid, vCompanyPE.comp_legalentity, vCompanyPE.comp_insurancerisk, 
+                         vCompanyPE.comp_nextinvoiceno, vCompanyPE.comp_funderrate, vCompanyPE.comp_personlink, vCompanyPE.comp_yearend, vCompanyPE.comp_debitcode, 
+                         vCompanyPE.Comp_OptOut
+FROM            Opportunity LEFT OUTER JOIN
+                         vCompanyPE ON Opportunity.Oppo_PrimaryCompanyId = vCompanyPE.Comp_CompanyId LEFT OUTER JOIN
+                         vPersonPE ON Opportunity.Oppo_PrimaryPersonId = vPersonPE.Pers_PersonId LEFT OUTER JOIN
+                         OpportunityProgress ON OpportunityProgress.Oppo_OpportunityId = Opportunity.Oppo_OpportunityId
+WHERE        (Opportunity.Oppo_Deleted IS NULL)
+Error Message: Failed to run query: CREATE VIEW vListCommunicationLead AS SELECT CASE WHEN Pers_FirstName IS NULL AND Pers_LastName IS NULL THEN RTRIM(ISNULL(Lead_PersonFirstName, '')) + ' ' + RTRIM(ISNULL(Lead_PersonLastName, '')) ELSE RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) END AS Pers_FullName, CASE WHEN Comp_Name IS NULL THEN RTRIM(ISNULL(Lead_CompanyName, '')) ELSE Comp_Name END AS Comp_Name, Pers_PersonId, Pers_CreatedBy, Pers_SecTerr, Comp_CompanyId, Comp_CreatedBy, Comp_SecTerr, comp_ChannelId, Comp_PrimaryUserId, Communication.*, Lead.*, CmLi_Comm_UserID, CmLi_Comm_PersonID, CmLi_Comm_CompanyID, CmLi_Comm_AccountId, CmLi_Comm_CommunicationID, CmLi_CommLinkId, CmLi_Comm_NotifyTime, CmLi_Comm_WaveResponse, CmLi_Comm_InitialWave, CmLi_Comm_LeadID, CmLi_Deleted, CmLi_CreatedDate, Pers_PrimaryUserID, Pers_ChannelID, CmLi_Recipient FROM Communication LEFT JOIN Comm_Link ON Comm_CommunicationID = CmLi_Comm_CommunicationID LEFT JOIN vPersonPE ON Pers_PersonId = CmLi_Comm_PersonID LEFT JOIN Lead ON Lead_LeadId = Cmli_Comm_LeadID LEFT JOIN vCompanyPE ON Comp_CompanyId = CmLi_Comm_CompanyID WHERE Comm_Deleted IS NULL AND CmLi_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vTLNewProduct AS SELECT DISTINCT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Pers_PersonID, Pers_CompanyID, Pers_PrimaryAddressID, Pers_PrimaryUserID, Pers_Salutation, Pers_FirstName, Pers_LastName, Pers_MiddleName, Pers_Suffix, Pers_Gender, Pers_Title, Pers_TitleCode, Pers_Department, Pers_Status, Pers_Source, Pers_Territory, Pers_Website, Pers_MailRestriction, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_EmailAddress, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_LibraryDir, Pers_ChannelID, Pers_UploadDate, Pers_SecTerr, Pers_CreatedBy, Comp_CompanyID, Comp_PrimaryPersonID, Comp_PrimaryAddressID, Comp_PrimaryUserID, Comp_Name, Comp_Type, Comp_Status, Comp_Source, Comp_Territory, Comp_Revenue, Comp_Employees, Comp_Sector, Comp_IndCode, Comp_Website, Comp_MailRestriction, Comp_PhoneCountryCode, Comp_PhoneAreaCode, Comp_PhoneNumber, Comp_FaxCountryCode, Comp_FaxAreaCode, Comp_FaxNumber, Comp_EmailAddress, Comp_LibraryDir, Comp_ChannelID, Comp_SecTerr, Comp_CreatedBy, Comp_UploadDate, Addr_AddressID, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode, Prod_Name, Oppo_ChannelID FROM vPersonPE LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId LEFT JOIN Opportunity ON Pers_PersonId = Oppo_PrimaryPersonId LEFT JOIN Orders ON Orde_OpportunityId = Oppo_OpportunityId LEFT JOIN OrderItems ON OrIt_OrderQuoteID = Orde_OrderQuoteID LEFT JOIN NewProduct ON Prod_ProductId = OrIt_ProductId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vTargetListIndividual AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, vPersonPE.*, Address.* FROM vPersonPE LEFT JOIN Address ON Pers_PrimaryAddressId = Addr_AddressId WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSummaryOrder AS SELECT vPersonPE.*, vCompanyPE.*, Opportunity.*, Orders.* FROM Orders LEFT JOIN Opportunity ON Orde_OpportunityId = Oppo_OpportunityId LEFT JOIN vPersonPE ON Oppo_PrimaryPersonId = Pers_PersonId LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyId = Comp_CompanyId WHERE Orde_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSummaryQuote AS SELECT vPersonPE.*, vCompanyPE.*, Opportunity.*, Quotes.* FROM Quotes LEFT JOIN Opportunity ON Quot_OpportunityId = Oppo_OpportunityId LEFT JOIN vPersonPE ON Oppo_PrimaryPersonId = Pers_PersonId LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyId = Comp_CompanyId WHERE Quot_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSearchListAccount AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, Account.*, Company.*, Person.*, Address.*, (SELECT CASE WHEN CompanyCount = 0 or AccountCount = 0 THEN NULL ELSE 'Y' END FROM vSharedAddress WHERE vSharedAddress.AdLi_AddressId = Addr_AddressId) as Addr_IsSharedAddress FROM Account LEFT JOIN Company ON Acc_CompanyId = Comp_CompanyId LEFT JOIN Person ON Acc_PrimaryPersonId = Pers_PersonId LEFT JOIN Address ON Acc_PrimaryAddressId = Addr_AddressId WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityAccount AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, Account.*, vCompanyPE.*, vPersonPE.*, Address.* FROM Account LEFT JOIN vCompanyPE on Acc_CompanyId = Comp_CompanyId LEFT JOIN vPersonPE ON Acc_PrimaryPersonID = Pers_PersonID LEFT JOIN Address ON Acc_PrimaryAddressId = Addr_AddressId WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSummaryAccount AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS User_Name, Account.*, Person.*, Company.*, Users.*, Email.*, Phone.*, vAddress.*, ERPI_IntegrationName, (SELECT CASE WHEN CompanyCount = 0 or AccountCount = 0 THEN NULL ELSE 'Y' END FROM vSharedAddress WHERE vSharedAddress.AdLi_AddressId = Addr_AddressId) as Addr_IsSharedAddress FROM Account LEFT JOIN Email ON Acc_AccountID = Emai_AccountID AND Emai_PersonID IS NULL AND UPPER(Emai_Type) = 'BUSINESS' AND Emai_Deleted IS NULL LEFT JOIN Company On Acc_CompanyId = Comp_CompanyId AND Comp_Deleted IS NULL LEFT JOIN vAddress ON Acc_PrimaryAddressId = Addr_AddressId LEFT JOIN Person ON Acc_PrimaryPersonId = Pers_PersonId AND Pers_Deleted IS NULL LEFT OUTER JOIN Phone on Acc_AccountId = Phon_AccountId AND Phon_PersonId IS NULL AND Lower(Phon_Type) = 'business' AND Phon_Deleted IS NULL LEFT JOIN Users ON Acc_PrimaryUserId = User_UserId AND User_Deleted IS NULL LEFT OUTER JOIN ERPIntegrations ON acc_intid = ERPI_IntegrationID AND ERPI_Deleted IS NULL WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vAccount AS SELECT Account.* FROM Account LEFT JOIN vAccountPhone ON Acc_AccountId = PLink_RecordId AND UPPER(PLink_Type) = 'BUSINESS' LEFT JOIN vAccountEmail ON Acc_AccountId = ELink_RecordId AND UPPER(ELink_type) = 'BUSINESS' WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vReportAccount AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Comp_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_PhoneNumber, '')) AS Comp_PhoneFullNumber, RTRIM(ISNULL(Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Comp_FaxNumber, '')) AS Comp_FaxFullNumber, Account.*, vCompanyPE.*, vPersonPE.*, Address.*, (SELECT CASE WHEN CompanyCount = 0 or AccountCount = 0 THEN NULL ELSE 'Y' END FROM vSharedAddress WHERE vSharedAddress.AdLi_AddressId = Addr_AddressId) as Addr_IsSharedAddress  FROM Account LEFT OUTER JOIN vAccountPhone on Acc_AccountId = PLink_RecordId and Lower(PLink_Type) = 'business' LEFT OUTER JOIN vAccountEmail on Acc_AccountId = ELink_RecordId And lower(elink_type) = 'business' LEFT OUTER JOIN vCompanyPE on Acc_CompanyId = Comp_CompanyId LEFT OUTER JOIN vPersonPE on Acc_PrimaryPersonId = Pers_PersonId LEFT OUTER JOIN Address on Acc_PrimaryAddressId = Addr_AddressId  WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vMailMergeAccount AS SELECT RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Pers_PersonId, Pers_Salutation, Pers_LastName, Pers_FirstName, Pers_MiddleName, Pers_Title, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_EmailAddress, Comp_Name, Comp_CompanyId, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Acc_AccountID, Acc_name, Acc_PrimaryUserId, Acc_SecTerr, Acc_CreatedBy, Acc_ChannelId FROM Account LEFT JOIN vCompanyPE ON Acc_CompanyId = Comp_CompanyId LEFT JOIN vPersonPE ON Acc_PrimaryPersonId = Pers_PersonId LEFT JOIN Address ON Acc_PrimaryAddressId = Addr_AddressId WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vMailMergeOrders AS SELECT * FROM Orders LEFT JOIN vQuoteOpportunity ON Orde_OpportunityId = Oppo_OpportunityId WHERE Orde_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vMailMergeQuotes AS SELECT * FROM Quotes LEFT JOIN vQuoteOpportunity ON Quot_OpportunityId = Oppo_OpportunityId WHERE Quot_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSearchListOrders AS SELECT vPersonPE.*, vCompanyPE.*, Opportunity.*, Orders.*, Address.* FROM Orders LEFT JOIN Opportunity ON Orde_OpportunityId = Oppo_OpportunityId LEFT JOIN vPersonPE ON Oppo_PrimaryPersonId = Pers_PersonId LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyId = Comp_CompanyId LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId WHERE Orde_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSearchListQuotes AS SELECT vPersonPE.*, vCompanyPE.*, Opportunity.*, Quotes.*, Address.* FROM Quotes LEFT JOIN Opportunity ON Quot_OpportunityId = Oppo_OpportunityId LEFT JOIN vPersonPE ON Oppo_PrimaryPersonId = Pers_PersonId LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyId = Comp_CompanyId  LEFT JOIN Address ON Comp_PrimaryAddressId = Addr_AddressId WHERE Quot_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vListQuotes AS SELECT Opportunity.*, Quotes.*, vPersonPE.*, vCompanyPE.* FROM Quotes INNER JOIN Opportunity ON Quot_OpportunityID = Oppo_OpportunityID LEFT JOIN vPersonPE ON Pers_PersonID = Oppo_PrimaryPersonID LEFT JOIN vCompanyPE ON Comp_CompanyID = Oppo_PrimaryCompanyID WHERE Quot_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vListOrders AS SELECT Opportunity.*, Orders.*, vPersonPE.*, vCompanyPE.* FROM Orders INNER JOIN Opportunity ON Orde_OpportunityID = Oppo_OpportunityID LEFT JOIN vPersonPE ON Pers_PersonID = Oppo_PrimaryPersonID LEFT JOIN vCompanyPE ON Comp_CompanyID = Oppo_PrimaryCompanyID WHERE Orde_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vOrderOppo AS SELECT Orders.*, vQuoteOpportunity.*, Account.* FROM Orders, vQuoteOpportunity LEFT OUTER JOIN Account ON Acc_AccountID = Oppo_PrimaryAccountID WHERE Orde_OpportunityID = Oppo_opportunityID AND Orde_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vQuoteOppos AS SELECT Quotes.*, vQuoteOpportunity.*, Account.* FROM Quotes, vQuoteOpportunity LEFT OUTER JOIN Account ON Acc_AccountID = Oppo_PrimaryAccountID WHERE Quot_OpportunityID = Oppo_OpportunityID AND Quot_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationQuotes AS SELECT Quotes.*, vPersonPE.*, vCompanyPE.*, Users.*, Escalations.*, Opportunity.* FROM Users INNER JOIN Opportunity ON Oppo_AssignedUserID = User_UserID AND Oppo_Deleted IS NULL LEFT JOIN vPersonPE ON Oppo_PrimaryPersonID = Pers_PersonID AND Pers_Deleted IS NULL LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyID = Comp_CompanyID AND Comp_Deleted IS NULL INNER JOIN Quotes ON Quot_OpportunityID = Oppo_OpportunityID AND Quot_Deleted IS NULL LEFT JOIN Escalations ON Quot_OrderQuoteID = Escl_RecordID AND Escl_TableID = 10254 AND Escl_Type IS NULL AND Escl_Deleted IS NULL WHERE User_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationOrders AS SELECT Orders.*, vPersonPE.*, vCompanyPE.*, Users.*, Escalations.*, opportunity.* FROM Users INNER JOIN Opportunity ON Oppo_AssignedUserID = User_UserID AND Oppo_Deleted IS NULL LEFT JOIN vPersonPE ON Oppo_PrimaryPersonID = Pers_PersonID AND Pers_Deleted IS NULL LEFT JOIN vCompanyPE ON Oppo_PrimaryCompanyID = Comp_CompanyID AND Comp_Deleted IS NULL INNER JOIN Orders ON Orde_OpportunityID = Oppo_OpportunityID AND Orde_Deleted IS NULL LEFT JOIN Escalations ON Orde_OrderQuoteID = Escl_RecordID AND Escl_TableID = 10253 AND Escl_Type IS NULL AND Escl_Deleted IS NULL WHERE User_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vEntityPhoneEmailAccount AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Phon_CountryCode, '')) + ' ' + RTRIM(ISNULL(Phon_AreaCode, '')) + ' ' + RTRIM(ISNULL(Phon_Number, '')) AS Acc_PhoneNumber, Account.*, vPersonPE.*, Emai_EmailAddress FROM Account LEFT JOIN vPersonPE ON Acc_PrimaryPersonID = Pers_PersonID LEFT JOIN vAccountPhone on Acc_AccountId = PLink_RecordId AND Lower(PLink_Type) = 'business' LEFT JOIN vAccountEmail on Acc_AccountId = ELink_RecordId AND lower(ELink_type) = 'business' AND Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vNotificationAccount AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(User_FirstName, '')) + ' ' + RTRIM(ISNULL(User_LastName, '')) AS User_Name, vAddress.*, vPersonPE.*, Account.*, Users.*, Escalations.* FROM Account LEFT JOIN vAddress ON Acc_PrimaryAddressId = Addr_AddressId LEFT JOIN vPersonPE ON Acc_PrimaryPersonId = Pers_PersonId AND Pers_Deleted IS NULL LEFT JOIN Users ON Acc_PrimaryUserId = User_UserId LEFT JOIN Escalations ON Acc_AccountId  = Escl_RecordID AND Escl_TableId = 10251 AND Escl_Deleted IS NULL WHERE Acc_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vPersonList AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, vPersonPE.*, vCompanyPE.*, Chan_ChannelId, Chan_Description FROM vPersonPE LEFT JOIN vCompanyPE ON Pers_CompanyID = Comp_CompanyID LEFT JOIN Channel ON Pers_ChannelId = Chan_ChannelId WHERE Pers_Deleted IS NULL 
+Error Message: Failed to run query: CREATE VIEW vRelaCompanyPerson AS SELECT Rend_RelatedEntityDataId, Rend_Entity1, Rend_Entity2, Rend_Relationship, Rend_Reciprocal, Rend_Type, Renl_Description, Rend_Notes, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber,  vPersonPE.Pers_EmailAddress, vPersonPE.Pers_Title, vPersonPE.Pers_TitleCode, vPersonPE.Pers_Department, vPersonPE.Pers_CreatedBy, vPersonPE.Pers_ChannelId, vPersonPE.Pers_SecTerr, vPersonPE.Pers_PrimaryUserId, vCompanyPE.Comp_Name, vCompanyPE.Comp_CompanyId, vCompanyPE.Comp_CreatedBy, vCompanyPE.Comp_SecTerr, vCompanyPE.Comp_ChannelId, vCompanyPE.Comp_PrimaryUserId, vPersonPE.pers_personid FROM vListRelatedEntityReportData, vPersonPE, vCompanyPE WHERE Rend_Entity1 = 'Company' AND Rend_Entity2 = 'Person' AND Rend_Entity1id = vCompanyPE.Comp_CompanyId AND Rend_Entity2id = vPersonPE.Pers_PersonId
+Error Message: Failed to run query: CREATE VIEW vDebtorsSummary
+AS 
+SELECT     dbo.LoanTransaction.Tran_TransactionId, dbo.LoanTransaction.Tran_CreatedBy, CONVERT(varchar(10), dbo.LoanTransaction.Tran_CreatedDate, 103) 
+                      AS TranCreateDate, dbo.LoanTransaction.Tran_UpdatedBy, dbo.LoanTransaction.Tran_UpdatedDate, dbo.LoanTransaction.Tran_TimeStamp, 
+                      dbo.LoanTransaction.Tran_Deleted, dbo.LoanTransaction.Tran_workflowid, dbo.LoanTransaction.tran_LoanId, dbo.LoanTransaction.tran_BatchId, 
+                      dbo.TransactionType.trty_description, cast(dbo.LoanTransaction.tran_amount AS numeric(24, 2))as TranAmount, CONVERT(VARCHAR(10), dbo.LoanTransaction.tran_Date, 103) AS tran_date, 
+                      dbo.LoanTransaction.tran_source, dbo.LoanTransaction.tran_description, dbo.LoanTransaction.tran_reference, dbo.LoanTransaction.tran_comment, 
+                      dbo.LoanTransaction.tran_status, dbo.LoanTransaction.tran_glcompanyid, dbo.LoanTransaction.tran_fundercontractid, dbo.Company.Comp_Name 
+FROM         dbo.LoanTransaction INNER JOIN 
+                      dbo.TransactionType ON dbo.LoanTransaction.tran_TransactionType = dbo.TransactionType.trty_TransactionTypeId INNER JOIN 
+                      dbo.Opportunity ON dbo.LoanTransaction.tran_LoanId = dbo.Opportunity.Oppo_OpportunityId INNER JOIN 
+                      dbo.Company ON dbo.Opportunity.Oppo_PrimaryCompanyId = dbo.Company.Comp_CompanyId 
+WHERE     (dbo.LoanTransaction.Tran_Deleted IS NULL)
+Error Message: Failed to run query: CREATE VIEW vLoanBalance
+AS 
+SELECT     loba_LoanBalanceId, loba_CreatedBy, loba_CreatedDate, loba_UpdatedBy, loba_UpdatedDate, loba_TimeStamp, loba_Deleted, loba_workflowid, loba_loanid, 
+                      loba_loanbalance, loba_overdueamnt, loba_installment, loba_amountdue, loba_Year, loba_Month, loba_effectiverate
+FROM         dbo.LoanBalance
+WHERE     (loba_Deleted IS NULL)
+Error Message: Failed to run query: CREATE VIEW vListCommunicationAccount AS select acc_accountid, acc_name, acc_secterr, acc_createdBy, acc_primaryuserid, acc_channelId, comm_communicationid, comm_createdby, comm_secterr, comm_channelId, cmli_comm_companyid, cmli_comm_personid, cmli_comm_accountid, cmli_createddate, comp_secterr, comp_createdby, comp_primaryuserId, comp_channelId, pers_secterr, pers_createdby, pers_PrimaryUserId, pers_channelId from communication left join comm_link on Comm_CommunicationId = CmLi_Comm_CommunicationId left join account on acc_accountid = cmli_comm_accountid left JOIN vCompanyPE on acc_companyid = comp_companyId left JOIN vPersonPE on acc_primarypersonid = pers_personID WHERE Comm_Deleted IS NULL AND CmLi_Deleted IS NULL and cmli_comm_accountid IS NOT NULL
+Error Message: Failed to run query: CREATE VIEW vwDashboardRaceCountM2009
+AS 
+select   '2009' as Year, pers_race,
+		case pers_race
+		when  'Black' then count(pers_race)
+		when 'White' then count(pers_race) end RaceCount,
+		(select count(pers_race) from vwDashboardracecount2009 where oppo_months = vwDashboardracecount2009.oppo_months) as total,
+		cast(case pers_race
+		when  'Black' then count(pers_race)
+		when 'White' then count(pers_race) end / 
+		cast((select count(pers_race) from vwDashboardracecount2009 where oppo_months = vwDashboardracecount2009.oppo_months) as decimal(5,1)) 
+		*100 as decimal(5,1)) as Percentage
+from vwDashboardracecount2009
+group by pers_race
+Error Message: Failed to run query: CREATE VIEW vwDashboardRacecountM2008
+AS 
+select  '2008' as Year,  pers_race, 
+case pers_race 
+when  'Black' then count(pers_race) 
+when 'White' then count(pers_race) end RaceCount, 
+(select count(pers_race) from vwDashboardracecount2008 where oppo_months = vwDashboardracecount2008.oppo_months) as total, 
+cast(case pers_race 
+when  'Black' then count(pers_race) 
+when 'White' then count(pers_race) end / 
+cast((select count(pers_race) from vwDashboardracecount2008 where oppo_months = vwDashboardracecount2008.oppo_months) as decimal(5,1)) 
+*100 as decimal(5,1)) as Percentage 
+from vwDashboardracecount2008 
+group by pers_race
+Error Message: Failed to run query: CREATE VIEW vwDashboardRacecountM2007
+AS 
+select '2007' as Year,  pers_race, 
+case pers_race 
+when  'Black' then count(pers_race) 
+when 'White' then count(pers_race) end RaceCount, 
+(select count(pers_race) from vwDashboardracecount2007 where oppo_months = vwDashboardracecount2007.oppo_months) as total, 
+cast(case pers_race 
+when  'Black' then count(pers_race) 
+when 'White' then count(pers_race) end / 
+cast((select count(pers_race) from vwDashboardracecount2007 where oppo_months = vwDashboardracecount2007.oppo_months) as decimal(5,1)) 
+*100 as decimal(5,1)) as Percentage 
+from vwDashboardracecount2007 
+group by pers_race
+Error Message: Failed to run query: CREATE VIEW vwDashboardRacecountM2006
+AS 
+select '2006' as Year,  pers_race, 
+case pers_race 
+when  'Black' then count(pers_race) 
+when 'White' then count(pers_race) end RaceCount, 
+(select count(pers_race) from vwDashboardracecount2006 where oppo_months = vwDashboardracecount2006.oppo_months) as total, 
+cast(case pers_race 
+when  'Black' then count(pers_race) 
+when 'White' then count(pers_race) end / 
+cast((select count(pers_race) from vwDashboardracecount2006 where oppo_months = vwDashboardracecount2006.oppo_months) as decimal(5,1)) 
+*100 as decimal(5,1)) as Percentage 
+from vwDashboardracecount2006 
+group by pers_race
+Error Message: Failed to run query: CREATE VIEW vwUtilityMailMerge
+AS 
+select Distinct vMailMergeOpportunity.BorrowerName, 
+		vMailMergeOpportunity.Pers_FirstName,
+isnull(rtrim(vMailMergeOpportunity.MailAddresspostal), rtrim(vMailMergeOpportunity.PhysicalAddress1)) as MailAddresspostal, 
+vMailMergeOpportunity.MailAddresspostal2,
+isnull(MailAddressSuburb, PhysicalAddressSuburb) as MailAddressSuburb, 
+case when isnull(vMailMergeOpportunity.MailAddressCity,vMailMergeOpportunity.PhysicalAddressCity) = 'None' then isnull(vMailMergeOpportunity.MailAddressSuburb, vMailMergeOpportunity.PhysicalAddressSuburb) 
+		else isnull(vMailMergeOpportunity.MailAddressCity,vMailMergeOpportunity.PhysicalAddressCity) end as MailAddressCity ,
+isnull(vMailMergeOpportunity.MailAddressPostCode, vMailMergeOpportunity.PhysicalAddressPostCode) as MailAddressPostCode,
+isnull(isnull(pers_emailaddress, comp_emailaddress), 'None') as Email,
+CONVERT (char, getdate(), 103 ) as Today,
+rtrim(users.user_firstname) + ' ' + rtrim(users.user_Lastname) as LoanAdministrator,
+user_phone,
+user_emailaddress,
+prop_descr, 
+prop_propertynr,
+prop_suburb
+from vMailMergeOpportunity  
+left outer join vOpportunity on vMailMergeOpportunity.oppo_Opportunityid = vOpportunity.oppo_opportunityid
+left outer join Users on vOpportunity.oppo_LoanAdministrator = Users.user_userid
+where vOpportunity.oppo_stage = 'Servicing'
+Error Message: Failed to run query: create view vMailMergeSolution as select RTRIM(ISNULL(Pers_PhoneCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_PhoneNumber, '')) AS Pers_PhoneFullNumber, RTRIM(ISNULL(Pers_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(Pers_FaxNumber, '')) AS Pers_FaxFullNumber, RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(Pers_FaxCountryCode, '1')) + '(' + RTRIM(ISNULL(Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, Soln_SolutionId, Soln_AssignedUserId, Soln_Secterr, Soln_CreatedBy, soln_ChannelId, Soln_Description, Case_Description, Case_ProblemType, Case_ProblemNote, Comp_CompanyId, Comp_Name, Comp_PrimaryUserId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Pers_PersonId, Pers_Salutation, Pers_LastName, Pers_FirstName, Pers_MiddleName, Pers_Title, Pers_PhoneCountryCode, Pers_PhoneAreaCode, Pers_PhoneNumber, Pers_FaxCountryCode, Pers_FaxAreaCode, Pers_FaxNumber, Pers_EmailAddress, Pers_PrimaryUserId, Pers_SecTerr, Pers_CreatedBy, Pers_ChannelId, Addr_Address1, Addr_Address2, Addr_Address3, Addr_Address4, Addr_Address5, Addr_City, Addr_State, Addr_Country, Addr_PostCode FROM vSolutionLink left join vPersonPE on Case_PrimaryPersonId=pers_personid left join vCompanyPE ON Pers_CompanyId = Comp_CompanyId left join Address ON Comp_PrimaryAddressId = Addr_AddressId 
+Error Message: Failed to run query: CREATE VIEW vCompanyMobilePE AS SELECT CEmail.Emai_EmailAddress as Comp_EmailAddress,CPhone.Phon_CountryCode as Comp_PhoneCountryCode,CPhone.Phon_AreaCode as Comp_PhoneAreaCode,CPhone.Phon_Number as Comp_PhoneNumber,CFax.Phon_CountryCode as Comp_FaxCountryCode,CFax.Phon_AreaCode as Comp_FaxAreaCode,CFax.Phon_Number as Comp_FaxNumber,Company.*, CEmail.Emai_EmailId, CPhone.Phon_PhoneId FROM Company LEFT JOIN vCompanyEmail CEmail ON ELink_RecordId = Comp_companyId AND UPPER(ELink_Type) = 'BUSINESS' LEFT JOIN vCompanyPhone CPhone ON CPhone.PLink_RecordId = Comp_CompanyId AND UPPER(CPhone.PLink_type) = 'BUSINESS' LEFT JOIN vCompanyPhone CFax ON CFax.PLink_RecordId = Comp_CompanyId AND UPPER(CFax.PLink_Type) = 'FAX' WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vCompanyFaxMobilePE AS SELECT CEmail.Emai_EmailAddress as Comp_EmailAddress,CPhone.Phon_CountryCode as Comp_PhoneCountryCode,CPhone.Phon_AreaCode as Comp_PhoneAreaCode,CPhone.Phon_Number as Comp_PhoneNumber,CFax.Phon_CountryCode as Comp_FaxCountryCode,CFax.Phon_AreaCode as Comp_FaxAreaCode,CFax.Phon_Number as Comp_FaxNumber,Company.*, CEmail.Emai_EmailId, CFax.Phon_PhoneId FROM Company LEFT JOIN vCompanyEmail CEmail ON ELink_RecordId = Comp_companyId AND UPPER(ELink_Type) = 'BUSINESS' LEFT JOIN vCompanyPhone CPhone ON CPhone.PLink_RecordId = Comp_CompanyId AND UPPER(CPhone.PLink_type) = 'BUSINESS' LEFT JOIN vCompanyPhone CFax ON CFax.PLink_RecordId = Comp_CompanyId AND UPPER(CFax.PLink_Type) = 'FAX' WHERE Comp_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vPersonMobilePE AS SELECT PEmail.Emai_EmailAddress as Pers_EmailAddress,PPhone.Phon_CountryCode as Pers_PhoneCountryCode,PPhone.Phon_AreaCode as Pers_PhoneAreaCode,PPhone.Phon_Number as Pers_PhoneNumber,PFax.Phon_CountryCode as Pers_FaxCountryCode,PFax.Phon_AreaCode as Pers_FaxAreaCode,PFax.Phon_Number as Pers_FaxNumber,Person.*, PEmail.Emai_EmailId, PPhone.Phon_PhoneId FROM Person LEFT JOIN vPersonEmail PEmail ON PEmail.ELink_RecordId = Pers_PersonId AND PEmail.ELink_Type = 'Business' LEFT JOIN vPersonPhone PPhone ON PPhone.PLink_RecordId = Pers_PersonId AND UPPER(PPhone.PLink_type) = 'BUSINESS' LEFT JOIN vPersonPhone PFax ON PFax.PLink_RecordId = Pers_PersonId AND UPPER(PFax.PLink_type) = 'FAX' WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vPersonFaxMobilePE AS SELECT PEmail.Emai_EmailAddress as Pers_EmailAddress,PPhone.Phon_CountryCode as Pers_PhoneCountryCode,PPhone.Phon_AreaCode as Pers_PhoneAreaCode,PPhone.Phon_Number as Pers_PhoneNumber,PFax.Phon_CountryCode as Pers_FaxCountryCode,PFax.Phon_AreaCode as Pers_FaxAreaCode,PFax.Phon_Number as Pers_FaxNumber,Person.*, PEmail.Emai_EmailId, PFax.Phon_PhoneId FROM Person LEFT JOIN vPersonEmail PEmail ON PEmail.ELink_RecordId = Pers_PersonId AND PEmail.ELink_Type = 'Business' LEFT JOIN vPersonPhone PPhone ON PPhone.PLink_RecordId = Pers_PersonId AND UPPER(PPhone.PLink_type) = 'BUSINESS' LEFT JOIN vPersonPhone PFax ON PFax.PLink_RecordId = Pers_PersonId AND UPPER(PFax.PLink_type) = 'FAX' WHERE Pers_Deleted IS NULL
+Error Message: Failed to run query: CREATE VIEW vSearchAttendees AS SELECT RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName,  vPersonPE.*, vCompanyPE.*, vAccount.* FROM vPersonPE LEFT JOIN vCompanyPE ON Pers_CompanyId = Comp_CompanyId LEFT JOIN vAccount ON Pers_AccountId = Acc_AccountId WHERE Pers_EmailAddress IS NOT NULL 
+Error Message: Failed to run query: CREATE VIEW vCompanyOpensAndClicks AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmDe_EmailAddress, Pers_FirstName AS EmDe_FirstName, Pers_LastName AS EmDe_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, Comp_PhoneFullNumber AS EmDe_PhoneNumber, EmDe_FirstOpen, EmDe_Opens,EmDe_Clicks FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND EmDe_Opens >= 1 AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountOpensAndClicks AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EntityId,EmDe_RecordId EmDe_EmailAddress, Pers_FirstName AS EmDe_FirstName, Pers_LastName AS EmDe_LastName, Pers_PhoneFullNumber AS EmDe_PhoneNumber, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, EmDe_FirstOpen, EmDe_Opens,EmDe_Clicks FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND EmDe_Opens >= 1 AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyUniqueOpensByTime AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmDe_EmailAddress, Pers_FirstName AS EmDe_FirstName, Pers_LastName AS EmDe_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, Comp_PhoneFullNumber AS EmDe_PhoneNumber, EmDe_FirstOpen, EmDe_Opens FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmDe_Opens >= 1 AND EmDe_Deleted IS NULL AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountUniqueOpensByTime AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmDe_EmailAddress, Pers_FirstName AS EmDe_FirstName, Pers_LastName AS EmDe_LastName, Pers_PhoneFullNumber AS EmDe_PhoneNumber, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, EmDe_FirstOpen, EmDe_Opens FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmDe_Opens >= 1 AND EmDe_Deleted IS NULL AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyUniqueOpensByEmail AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmDe_EmailAddress, Pers_FirstName AS EmDe_FirstName, Pers_LastName AS EmDe_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, Comp_PhoneFullNumber AS EmDe_PhoneNumber, EmDe_FirstOpen, EmDe_Opens FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmDe_Opens >= 1 AND EmDe_Deleted IS NULL AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountUniqueOpensByEmail AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmDe_EmailAddress, Pers_FirstName AS EmDe_FirstName, Pers_LastName AS EmDe_LastName, Pers_PhoneFullNumber AS EmDe_PhoneNumber, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, EmDe_FirstOpen, EmDe_Opens FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmDe_Opens >= 1 AND EmDe_Deleted IS NULL AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyOpensByEmail AS SELECT EmOp_EmailOpenId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmOp_EntityId, EmOp_RecordId, EmOp_EmailAddress, Pers_FirstName AS EmOp_FirstName, Pers_LastName AS EmOp_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, Comp_PhoneFullNumber AS EmOp_PhoneNumber, EmOp_OpenTime FROM EMarketingEmailOpens JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmOp_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmOp_RecordId WHERE EmOp_Deleted IS NULL AND EmOp_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountOpensByEmail AS SELECT EmOp_EmailOpenId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmOp_EntityId, EmOp_RecordId, EmOp_EmailAddress, Pers_FirstName AS EmOp_FirstName, Pers_LastName AS EmOp_LastName, Pers_PhoneFullNumber AS EmOp_PhoneNumber, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, EmOp_OpenTime FROM EMarketingEmailOpens JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmOp_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmOp_RecordId WHERE EmOp_Deleted IS NULL AND EmOp_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyOpensByTime AS SELECT EmOp_EmailOpenId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmOp_EntityId, EmOp_RecordId, EmOp_EmailAddress, Pers_FirstName AS EmOp_FirstName, Pers_LastName AS EmOp_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, Comp_PhoneFullNumber AS EmOp_PhoneNumber, EmOp_OpenTime FROM EMarketingEmailOpens JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmOp_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmOp_RecordId WHERE EmOp_Deleted IS NULL AND EmOp_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountOpensByTime AS SELECT EmOp_EmailOpenId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmOp_EntityId, EmOp_RecordId, EmOp_EmailAddress, Pers_FirstName AS EmOp_FirstName, Pers_LastName AS EmOp_LastName, Pers_PhoneFullNumber AS EmOp_PhoneNumber, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, EmOp_OpenTime FROM EMarketingEmailOpens JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmOp_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmOp_RecordId WHERE EmOp_Deleted IS NULL AND EmOp_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyUniqueClicksByLink AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmLi_Link, EmDe_EmailAddress, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingClickedLink JOIN EMarketingEmailLink ON EmCl_EmailLinkId = EmLi_EmailLinkId JOIN EMarketingEmailDetail ON EmCl_EmailDetailId = EmDe_EmailDetailId JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmCl_Clicks >= 1 AND EmCl_Deleted IS NULL AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountUniqueClicksByLink AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmLi_Link, EmDe_EmailAddress, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingClickedLink JOIN EMarketingEmailLink ON EmCl_EmailLinkId = EmLi_EmailLinkId JOIN EMarketingEmailDetail ON EmCl_EmailDetailId = EmDe_EmailDetailId JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmCl_Clicks >= 1 AND EmCl_Deleted IS NULL AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyUniqueClicksByEml AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, Emli_Link, EmCl_FirstClick, SUM(EmCl_Clicks) AS EmCl_Count, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN EMarketingClickedLink ON EmDe_EmailDetailId = EmCl_EmailDetailId JOIN EMarketingEmailLink ON EmLi_EmailLinkId = EmCl_EmailLinkId JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmCl_Deleted IS NULL AND EmDe_EntityId = 5 GROUP BY EmDe_EmailDetailId, EmDe_EmailAddress, EmLi_Link, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Pers_Secterr, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, Comp_PrimaryPersonId, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmCl_FirstClick
+Error Message: Failed to run query: CREATE VIEW vAccountUniqueClicksByEml AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, Emli_Link, EmCl_FirstClick, SUM(EmCl_Clicks) AS EmCl_Count, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN EMarketingClickedLink ON EmDe_EmailDetailId = EmCl_EmailDetailId JOIN EMarketingEmailLink ON EmLi_EmailLinkId = EmCl_EmailLinkId JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmCl_Deleted IS NULL AND EmDe_EntityId = 10251 GROUP BY EmDe_EmailDetailId, EmDe_EmailAddress, EmLi_Link, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Pers_Secterr, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId, WiEm_WaveItemId, EmDe_EntityId, EmDe_RecordId, EmCl_FirstClick
+Error Message: Failed to run query: CREATE VIEW vCompanyClicksByLink AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, Emli_Link, EmCl_FirstClick, EmCl_Clicks, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId,  Pers_ChannelId FROM EMarketingEmailDetail JOIN EMarketingClickedLink ON EmDe_EmailDetailId = EmCl_EmailDetailId JOIN EMarketingEmailLink ON EmLi_EmailLinkId = EmCl_EmailLinkId JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmCl_Deleted IS NULL AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountClicksByLink AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, Emli_Link, EmCl_FirstClick, EmCl_Clicks, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN EMarketingClickedLink ON EmDe_EmailDetailId = EmCl_EmailDetailId JOIN EMarketingEmailLink ON EmLi_EmailLinkId = EmCl_EmailLinkId JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmCl_Deleted IS NULL AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyUnopened AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId, Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, Pers_FirstName, Pers_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND (EmDe_Opens = 0  AND EmDe_RawScore = 0) AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountUnopened AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, Pers_FirstName, Pers_LastName, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND (EmDe_Opens = 0 AND EmDe_RawScore = 0) AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyBounced AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId,  Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, EmDe_Code, EmDe_RawScore, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND EmDe_Bounced > 0 AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountBounced AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, EmDe_Code, EmDe_RawScore, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND EmDe_Bounced > 0 AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vCompanyUnsent AS SELECT EmDe_EmailDetailId, Comp_CompanyId, Comp_Secterr, Comp_CreatedBy, Comp_PrimaryUserId,  Comp_ChannelId, Comp_PrimaryPersonId, Acc_AccountId, Acc_CreatedBy, Acc_ChannelId, Acc_PrimaryUserId, Acc_Secterr, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, EmDe_RawScore, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListCompany ON Comp_CompanyId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND EmDe_RawScore < 0 AND EmDe_Bounced = 0 AND EmDe_EntityId = 5
+Error Message: Failed to run query: CREATE VIEW vAccountUnsent AS SELECT EmDe_EmailDetailId, Acc_AccountId, Acc_Secterr, Acc_CreatedBy, Acc_PrimaryUserId, Acc_ChannelId, Comp_CompanyId, Comp_SecTerr, Comp_CreatedBy, Comp_ChannelId, Comp_PrimaryUserId, WiEm_WaveItemId, EmDe_EmailAddress, EmDe_EntityId, EmDe_RecordId, EmDe_RawScore, Pers_Secterr, Pers_CreatedBy, Pers_PrimaryUserId, Pers_ChannelId FROM EMarketingEmailDetail JOIN WaveItem_Email ON WiEm_WaveItem_EmailId = EmDe_WaveItemEmailId JOIN vSearchListAccount ON Acc_AccountId = EmDe_RecordId WHERE EmDe_Deleted IS NULL AND EmDe_RawScore < 0 AND EmDe_Bounced = 0 AND EmDe_EntityId = 10251
+Error Message: Failed to run query: CREATE VIEW vLastPayment
+AS 
+SELECT   RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName, 
+  pers_phonenumber AS Comp_PhoneFullNumber, 
+                      RTRIM(ISNULL(dbo.Company.Comp_FaxCountryCode, '')) + ' ' + RTRIM(ISNULL(dbo.Company.Comp_FaxAreaCode, '')) 
+                      + ' ' + RTRIM(ISNULL(dbo.Company.Comp_FaxNumber, '')) AS Comp_FaxFullNumber, pers_phonenumber AS Pers_PhoneFullNumber, RTRIM(ISNULL(dbo.Person.Pers_FaxCountryCode, '')) 
+                      + ' ' + RTRIM(ISNULL(dbo.Person.Pers_FaxAreaCode, '')) + ' ' + RTRIM(ISNULL(dbo.Person.Pers_FaxNumber, '')) AS Pers_FaxFullNumber, 
+                      RTRIM(ISNULL(dbo.Person.Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(dbo.Person.Pers_LastName, '')) + '[FAX: +' + RTRIM(ISNULL(dbo.Person.Pers_FaxCountryCode, 
+                      '1')) + '(' + RTRIM(ISNULL(dbo.Person.Pers_FaxAreaCode, '')) + ')' + RTRIM(ISNULL(dbo.Person.Pers_FaxNumber, '')) + ']' AS Pers_EmailFaxNumber, 
+Person.*, vTotalPaid.*, Company.* , dbo.Address.*, dbo.Address_Link.AdLi_Type, vPersonAddresses.*,
+                     CASE WHEN oppo_primarycompanyid IS NULL THEN 
+                          (SELECT     rtrim(isnull(pers_firstname, ' ')) + ' ' + rtrim(isnull(pers_lastname, ' ')) + ' - Identity Number:' + rtrim(isnull(pers_idno, '-')) 
+                            FROM          person 
+                            WHERE      pers_personid = Oppo_PrimaryPersonId) ELSE 
+                          (SELECT     rtrim(isnull(comp_name, ' ')) + ' - Registration Number:' + rtrim(isnull(comp_regno, '-')) 
+                            FROM          company 
+                            WHERE      comp_companyid = Oppo_PrimaryCompanyId) 
+                     END 
+                       AS Borrower, 
+
+                     CASE WHEN oppo_primarycompanyid IS NULL THEN 
+                          (SELECT     rtrim(isnull(pers_firstname, ' ')) + ' ' + rtrim(isnull(pers_lastname, '-')) 
+                            FROM          person 
+                            WHERE      pers_personid = Oppo_PrimaryPersonId) ELSE 
+                          (SELECT     rtrim(isnull(comp_name, '-')) 
+                            FROM          company 
+                            WHERE      comp_companyid = Oppo_PrimaryCompanyId) 
+                     END 
+                       AS BorrowerName, 
+
+                     CASE WHEN oppo_primarycompanyid IS NULL THEN 
+                          (SELECT     rtrim(isnull(dbo.address.addr_address1, ' ')) + CHAR(13) + CHAR(10) + ' ' + rtrim(isnull(dbo.address.addr_address2, ' ')) + CHAR(13) + CHAR(10) 
+                                                   + ' ' + rtrim(isnull(dbo.address.addr_city, ' ')) + CHAR(13) + CHAR(10) + ' ' + rtrim(isnull(dbo.address.addr_postcode, '-')) 
+                            FROM          dbo.address INNER JOIN 
+                                                   dbo.person ON dbo.address.addr_addressid = dbo.person.pers_primaryaddressid 
+                            WHERE      pers_personid = Oppo_PrimaryPersonId) ELSE 
+                          (SELECT     rtrim(isnull(dbo.address.addr_address1, ' ')) + CHAR(13) + CHAR(10) + ' ' + rtrim(isnull(dbo.address.addr_address2, ' ')) + CHAR(13) + CHAR(10) 
+                                                   + ' ' + rtrim(isnull(dbo.address.addr_city, ' ')) + CHAR(13) + CHAR(10) + ' ' + rtrim(isnull(dbo.address.addr_postcode, '-')) 
+                            FROM          dbo.address INNER JOIN 
+                                                   dbo.company ON dbo.address.addr_addressid = dbo.company.comp_primaryaddressid 
+                            WHERE      comp_companyid = Oppo_PrimaryCompanyId) 
+                     END 
+                       AS MailAddress, 
+
+                     pers_phonenumber 
+                       AS PhoneNumber, 
+
+                     CASE WHEN dbo.Person.Pers_EmailAddress IS NULL THEN 
+                          (SELECT     rtrim(isnull(dbo.Company.Comp_EmailAddress, '-')) 
+                            FROM          company 
+                            WHERE      comp_companyid = Oppo_PrimaryCompanyId) ELSE 
+                          (SELECT     rtrim(isnull(dbo.Person.Pers_EmailAddress, '-')) 
+                            FROM          person 
+                            WHERE      pers_personid = Oppo_PrimaryPersonId) 
+                     END 
+                       AS Email 
+FROM         dbo.vTotalPaid LEFT OUTER JOIN 
+                      dbo.Person ON dbo.vTotalPaid.Oppo_PrimaryPersonId = dbo.Person.Pers_PersonId LEFT OUTER JOIN 
+                      dbo.Company ON dbo.Person.Pers_CompanyId = dbo.Company.Comp_CompanyId LEFT OUTER JOIN 
+						dbo.Address ON dbo.Person.Pers_PrimaryAddressId = dbo.Address.Addr_AddressId LEFT  OUTER JOIN 
+						dbo.Address_Link ON dbo.Address.Addr_AddressId = dbo.Address_Link.AdLi_AddressId LEFT OUTER JOIN
+						dbo.vPersonAddresses ON dbo.Person.pers_personid = dbo.vPersonAddresses.person_adli_id
+WHERE     (dbo.vTotalPaid.Oppo_Deleted IS NULL) AND oppo_status IS NOT NULL
+Error Message: Failed to run query: CREATE VIEW vOutboundMainView 
+AS 
+SELECT 
+	RTRIM(ISNULL(Pers_FirstName, '')) + ' ' + RTRIM(ISNULL(Pers_LastName, '')) AS Pers_FullName,
+	Pers_PersonId,	
+	Pers_CompanyId,	
+	Pers_PrimaryAddressId,
+	Pers_FirstName,
+	Pers_LastName,                          
+	Pers_Gender,
+	Pers_Title,
+	Pers_Department,
+	Pers_LibraryDir,
+	pers_idno,
+	pers_dateofbirth,
+	pers_azfoccupation,
+	pers_idtype,
+	pers_companyname,
+	pers_Beneficiary,
+	pers_salaryday, 
+	Oppo_OpportunityId,
+	Oppo_PrimaryCompanyId,
+	Oppo_PrimaryPersonId,
+	Oppo_AssignedUserId,
+	Oppo_Description,
+	Oppo_Type,                      
+	Oppo_Opened,
+	Oppo_Closed,
+	Oppo_Status,
+	Oppo_Stage,
+	Oppo_Priority,
+	Oppo_CreatedBy,
+	Oppo_CreatedDate,
+	Oppo_UpdatedBy,
+	Oppo_UpdatedDate,
+	Oppo_TimeStamp,
+	Oppo_Deleted,
+	Oppo_SecTerr,
+	Oppo_WorkflowId,
+	oppo_entrycode,
+	oppo_amountappliedfor,
+	oppo_amountappliedfor_CID,
+	oppo_firstinstallment,
+	oppo_paymentmethod,
+	oppo_glcompany,
+	oppo_loanperiodm,
+	oppo_applicationdate,
+	oppo_instalamount,
+	oppo_instalamount_CID,
+	oppo_aa,
+	oppo_bankid,
+	oppo_ChannelReceived,
+	oppo_ApplicationNumber,
+	oppo_ProductLine,
+	oppo_MonthlyPaymentAmount,
+	oppo_MonthlyDeductionDay,
+	oppo_CreditCard,
+	oppo_CountryN,
+	oppo_DealSheet,
+	oppo_AccpacCustomer,
+	oppo_valid,
+	oppo_DealBranch,
+	oppo_DocumentLinked,
+	oppo_expectedloanperiod,
+	oppo_PrimaryOrderId,
+	oppo_deliveryoptin,
+	oppo_updatecollectionmethod,
+	oppo_TransactionList,
+	oppo_AccountStatus,
+	oppo_PaymentCalculatorList,
+	Mobile.phon_Number MobileNo, 
+	Mobile2.phon_Number MobileNo2, 
+	Business.phon_Number BusinessNo,
+	Residential.Addr_Address1 ResAddress1,
+	Residential.aloo_Province ResProvince,
+	Residential.aloo_City ResCity,
+	Residential.aloo_Suburb ResSuburb,
+	Residential.aloo_Postcode ResCode,
+	Residential.aloo_Country ResCountry,
+	Postal.Addr_Address1 PosAddress1,
+	Postal.aloo_Province PosProvince,
+	Postal.aloo_City PosCity,
+	Postal.aloo_Suburb PosSuburb,
+	Postal.aloo_Postcode PosCode,
+	Postal.aloo_Country PosCountry,
+	Employer.Addr_Address1 EmpAddress1,
+	Employer.aloo_Province EmpProvince,
+	Employer.aloo_City EmpCity,
+	Employer.aloo_Suburb EmpSuburb,
+	Employer.aloo_Postcode EmpCode,
+	Employer.aloo_Country EmpCountry
+FROM	Opportunity WITH (NOLOCK) LEFT OUTER JOIN Person WITH (NOLOCK) ON Oppo_PrimaryPersonId = Pers_PersonId 
+					LEFT OUTER JOIN Company WITH (NOLOCK) ON Oppo_PrimaryCompanyId = Comp_CompanyId 
+					OUTER APPLY fn_GetPhoneByType(Pers_PersonId, 'Mobile') Mobile
+					OUTER APPLY fn_GetPhoneByType(Pers_PersonId, 'Mobile2') Mobile2
+					OUTER APPLY fn_GetPhoneByType(Pers_PersonId, 'Business') Business
+					OUTER APPLY fn_GetAdressByType(Pers_PersonId, 'Residential') Residential                             
+					OUTER APPLY fn_GetAdressByType(Pers_PersonId, 'Postal') Postal                                  
+					OUTER APPLY fn_GetAdressByType(Pers_PersonId, 'Employer') Employer 
+					
+WHERE   Oppo_Deleted IS NULL  AND Oppo_PrimaryPersonId is NOT NULL AND Oppo_Type != 'Commission'
+Error Message: Failed to run query: CREATE VIEW mOppoListDelta  AS  SELECT *, (	SELECT Max(v) FROM (VALUES((select  top 1 note_updateddate from  Notes where  Note_ForeignTableId = (select Bord_TableId from Custom_Tables where Bord_Name = 'opportunity') and Note_ForeignId = vo.Oppo_OpportunityId order by note_updateddate desc)),(oppo_UpdatedDate)) AS value(v)) as plink_maxupdateddate, Oppo_OpportunityId AS plink_opportunityid, oppo_assigneduserid AS plink_oppoprimaryuserid, oppo_channelid AS plink_oppochannelid, oppo_primarycompanyid AS plink_oppocompanyid,(SELECT Note_CreatedDate AS '@note_createddate', Replace(Replace(Replace(Replace(Note_Note, '<', 'angbrackLT'), '>', 'angbrackGT'), '&lt;', 'angbrackLT'), '&gt;', 'angbrackGT') AS '@Note_Note', Note_CreatedBy AS '@Note_CreatedBy' FROM Notes WHERE Note_ForeignTableId = (SELECT Bord_TableId FROM Custom_Tables WHERE Bord_Name = 'Opportunity') AND Note_Deleted IS NULL AND Note_ForeignId = vo.Oppo_OpportunityId FOR xml path('note'), root('notes'))  AS plink_oppo_notes FROM Opportunity vo WHERE oppo_status = 'In Progress' 
+Error Message: Failed to run query: CREATE VIEW mOppoList  AS  select *,  Oppo_OpportunityId as plink_opportunityid, oppo_assigneduserid as plink_oppoprimaryuserid, oppo_channelid as plink_oppochannelid, oppo_primarycompanyid as plink_oppocompanyid,  (  select  Note_CreatedDate as '@note_createddate', Replace( Replace( Replace( Replace( Note_Note, '<','angbrackLT'),'>','angbrackGT'),'&lt;','angbrackLT'),'&gt;','angbrackGT') as '@Note_Note', Note_CreatedBy as '@Note_CreatedBy'  from  Notes  where  Note_ForeignTableId = (select Bord_TableId from Custom_Tables where Bord_Name = 'Opportunity') and Note_Deleted is NULL and  Note_ForeignId = vo.Oppo_OpportunityId  for xml path( 'note' ), root( 'notes' )  ) as plink_oppo_notes  from vOpportunity vo where oppo_status = 'In Progress'
+Error Message: Failed to run query: Create view mPersonAllDetails as  select *,  (  select top 1 Phon_FullNumber from vPersonPhoneCaption vpc where upper(Capt_Code) = 'MOBILE'  and vpc.PLink_RecordId = vp.Pers_PersonId  )  as plink_persmobile  ,  pers_companyid as plink_perscompanyid, pers_primaryuserid as plink_persprimaryuserid, pers_channelid as plink_perschannelid, (  select top 1 (IsNull(Addr_Address1,' ') + IsNull(Addr_Address2,' ') + IsNull(Addr_Address3,' ') + IsNull(Addr_Address4,' ') + IsNull(Addr_City,' ')) from vAddressPerson vap  WHERE vap.addr_addressid = vp.Pers_PrimaryAddressId      )  as plink_persaddress  ,   (  SELECT top 5 rtrim(comm_action) as '@comm_action', rtrim(Comm_Status) as '@comm_status',  rtrim(Comm_Type) as '@type', rtrim(Comm_Description) as '@comm_description', comm_note  as '@comm_note', comm_secterr as '@comm_secterr', comm_createddate  as '@comm_createddate'  FROM  mListCommunication vc   where vc.CmLi_Comm_PersonID = vp.Pers_PersonId  order by Comm_CommunicationId desc  for xml path( 'communication' ), root( 'communications' )      )  as plink_perscommunications  ,      (  select  Note_CreatedDate as '@note_createddate', Replace( Replace( Replace( Replace( Note_Note, '<','angbrackLT'),'>','angbrackGT'),'&lt;','angbrackLT'),'&gt;','angbrackGT')  as '@Note_Note', Note_CreatedBy as '@Note_CreatedBy'  from  Notes  where  Note_ForeignTableId = (select Bord_TableId from Custom_Tables where Bord_Name = 'person') and Note_Deleted is Null  and  Note_ForeignId = vp.Pers_PersonId  for xml path( 'note' ), root( 'notes' )  )  as plink_persnotes,  (  select  top 5  op.Oppo_Description as '@oppo_description',  c.Curr_Symbol as '@oppo_forecast_CID',  op.oppo_forecast as '@oppo_forecast',  op.Oppo_Note as '@oppo_note',  op.Oppo_Stage as '@oppo_stage',  op.oppo_status as '@oppo_status',  op.Oppo_AssignedUserId as '@oppouser',  op.Oppo_CreatedDate as '@createddate'  from vOpportunity op, Currency c  where op.Oppo_PrimaryPersonId = vp.Pers_PersonId and c.Curr_CurrencyID = op.Oppo_Forecast_CID  order by op.Oppo_OpportunityId desc  for xml path( 'opportunity' ), root( 'opportunities' )  )  as plink_persopportunities  ,  pers_SecTerr as comm_secterr,  pers_SecTerr as oppo_secterr,   Pers_CreatedBy as comm_createdby,  Pers_CreatedBy as oppo_createdby,   Pers_ChannelID as Comm_ChannelId,  Pers_ChannelID as oppo_ChannelId,   Pers_CreatedBy as CmLi_Comm_UserId,  Pers_CreatedBy as oppo_UserId,  Pers_PrimaryUserId as oppo_assigneduserid, pers_companyid as cmli_comm_companyid, pers_companyid as Oppo_PrimaryCompanyId, pers_secterr as comp_secterr, Pers_PrimaryUserId as comp_primaryuserid, Pers_CreatedBy as comp_createdby  from  vPerson vp
+Error Message: Failed to run query: Create view mPersonAllDetailsDelta as select epd_pers.epd_EmailAddress AS Pers_EmailAddress, epd_pers.epd_PhoneCountryCode AS Pers_PhoneCountryCode,epd_pers.epd_PhoneAreaCode AS Pers_PhoneAreaCode, epd_pers.epd_PhoneNumber AS Pers_PhoneNumber, epd_pers.epd_FaxCountryCode AS Pers_FaxCountryCode, epd_pers.epd_FaxAreaCode AS Pers_FaxAreaCode, epd_pers.epd_FaxNumber AS Pers_FaxNumber,vp.*,(SELECT Max(v) FROM (VALUES ((SELECT TOP 1 comm_updateddate FROM  mListCommunication vc   where vc.CmLi_Comm_PersonID = vp.Pers_PersonId  order by Comm_CommunicationId desc )),((select  top 1 note_updateddate from  Notes  where  Note_ForeignTableId = (select Bord_TableId from Custom_Tables where Bord_Name = 'person') and  Note_ForeignId = vp.Pers_PersonId order by note_updateddate desc )), ((select  top 1  oppo_updateddate from vOpportunity op  where op.Oppo_PrimaryPersonId = vp.Pers_PersonId order by op.Oppo_OpportunityId desc )), ((select top 1 Addr_UpdatedDate from vAddressPerson vap  WHERE vap.addr_addressid = vp.Pers_PrimaryAddressId  )),(Pers_UpdatedDate)) AS value(v)) as plink_maxupdateddate, (  select top 1 Phon_FullNumber from vPersonPhoneCaption vpc where upper(Capt_Code) = 'MOBILE' and vpc.PLink_RecordId = vp.Pers_PersonId  )  as plink_persmobile  ,  pers_companyid as plink_perscompanyid, pers_primaryuserid as plink_persprimaryuserid, pers_channelid as plink_perschannelid, (  select top 1 (IsNull(Addr_Address1,' ') +IsNull(Addr_Address2,' ') + IsNull(Addr_Address3,' ') + IsNull(Addr_Address4,' ') + IsNull(Addr_City,' ')) from vAddressPerson vap  WHERE vap.addr_addressid = vp.Pers_PrimaryAddressId      )  as plink_persaddress  ,   (SELECT top 5 rtrim(comm_action) as '@comm_action', rtrim(Comm_Status) as '@comm_status',  rtrim(Comm_Type) as '@type', rtrim(Comm_Description) as '@comm_description', comm_note  as '@comm_note', comm_secterr as '@comm_secterr', comm_createddate  as '@comm_createddate'  FROM  mListCommunication vc   where vc.CmLi_Comm_PersonID = vp.Pers_PersonId  order by Comm_CommunicationId desc  for xml path( 'communication' ), root( 'communications' )      )  as plink_perscommunications  ,      (  select  Note_CreatedDate as '@note_createddate', Replace( Replace( Replace( Replace( Note_Note, '<','angbrackLT'),'>','angbrackGT'),'&lt;','angbrackLT'),'&gt;','angbrackGT')  as '@Note_Note', Note_CreatedBy as '@Note_CreatedBy'  from  Notes  where  Note_ForeignTableId = (select Bord_TableId from Custom_Tables where Bord_Name = 'person') and Note_Deleted is Null  and  Note_ForeignId = vp.Pers_PersonId  for xml path( 'note' ), root( 'notes' )  ) as plink_persnotes,  (select  top 5  op.Oppo_Description as '@oppo_description',  c.Curr_Symbol as '@oppo_forecast_CID',  op.oppo_forecast as '@oppo_forecast',  op.Oppo_Note as '@oppo_note',  op.Oppo_Stage as '@oppo_stage',  op.oppo_status as '@oppo_status',  op.Oppo_AssignedUserId as '@oppouser',  op.Oppo_CreatedDate as '@createddate'  from vOpportunity op, Currency c  where op.Oppo_PrimaryPersonId = vp.Pers_PersonId and c.Curr_CurrencyID = op.Oppo_Forecast_CID  order by op.Oppo_OpportunityId desc  for xml path( 'opportunity' ), root( 'opportunities' )) as plink_persopportunities  ,  pers_SecTerr as comm_secterr,  pers_SecTerr as oppo_secterr,   Pers_CreatedBy as comm_createdby,  Pers_CreatedBy as oppo_createdby,   Pers_ChannelID as Comm_ChannelId,  Pers_ChannelID as oppo_ChannelId,   Pers_CreatedBy as CmLi_Comm_UserId,  Pers_CreatedBy as oppo_UserId,  Pers_PrimaryUserId as oppo_assigneduserid, pers_companyid as cmli_comm_companyid, pers_companyid as Oppo_PrimaryCompanyId, pers_secterr as comp_secterr, Pers_PrimaryUserId as comp_primaryuserid, Pers_CreatedBy as comp_createdby  from  dbo.Person vp LEFT OUTER JOIN dbo.CRMEmailPhoneData AS epd_pers ON epd_pers.epd_EntityID = 13 AND epd_pers.epd_RecordID = vp.Pers_PersonId
+Error Message: Failed to run query: CREATE VIEW vwTransactionHistory
+AS 
+SELECT	ISNULL(SUM(ISNULL(TransactionAmount, 0)) OVER (PARTITION BY tran_loanId ORDER BY CAST(tran_date AS DATE), tran_transactionId ROWS BETWEEN UNBOUNDED PRECEDING AND 1 PRECEDING),0) tlst_openingbalance, 
+SUM(ISNULL(TransactionAmount, 0)) OVER (PARTITION BY tran_loanId ORDER BY CAST(tran_date AS DATE), tran_transactionId) tlst_closingbalance, 
+TransactionAmount AS tlst_transactionamount, 
+* 
+FROM vTransactionHistory 
+CROSS APPLY dbo.GetTransAmountInline(tran_amount, tran_transactiontype) Q
+left outer join Opportunity on oppo_opportunityid = tran_loanid
+
