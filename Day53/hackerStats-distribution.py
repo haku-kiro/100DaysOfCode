@@ -2,11 +2,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-np.random.seed(42)
+np.random.seed(69)
 
 # Simulate random walk 500 times
 all_walks = []
-iterations = 500
+iterations = 2000000
 for i in range(iterations) :
     random_walk = [0]
     for x in range(100) :
@@ -36,5 +36,6 @@ chance_to_suceed = len(ends[ends >=60]) / iterations * 100
 print(f"You are {chance_to_suceed}% likely to succeed")
 
 # Plot histogram of ends, display plot
-plt.hist(ends)
+plt.plot(ends)
+plt.plot(500, 60)
 plt.show()
