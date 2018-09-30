@@ -2,6 +2,7 @@ import logger
 import DAL
 import pandas as pd
 import fileLoader
+import CRMActions as Actions
 
 # Just showing how to use the logger
 # logger.InfoMessage("This is a test message")
@@ -22,3 +23,6 @@ import fileLoader
 
 # for x in columns:
 #     print(x._name)
+
+act = Actions.SageActions()
+act.AddFields()

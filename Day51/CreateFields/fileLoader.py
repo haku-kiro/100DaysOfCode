@@ -24,8 +24,9 @@ class ColLoader:
     def __init__(self):
         colsToBeCreated = []
 
-        # note that the path is taken from the config file
+        # note that the path is taken from the config file (This is filth - use a df...)
         with open(Config.CSV_PATH, 'r') as f:
+            header = f.readline() # pulling the header out ... again, use pandas ...
             for line in f:
                 data = line.split(',')
                 item = colRow(data[0], data[1], data[2], data[3], data[4])

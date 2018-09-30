@@ -13,6 +13,7 @@ class SageActions:
         Create an instance of SageActions
         """
         self._fields = fileLoader.ColLoader()._cols # fields are instances of the colRow class
+        # Should create an instance of the dal in the ctor
 
     def MetadataRefresh(self):
         """
@@ -48,6 +49,46 @@ ORDER BY 1 DESC
             viewScript = CreateViews.loc[view]["CuVi_ViewScript"]
             dal.NonReader(viewScript) 
 
+    def AddFields(self):
+        """
+        Method to add the field to the entity
+        Currently just adds all the fields in the self object
+        """
+        dal = DAL.DAL()
+
+        for field in self._fields:
+            try:
+                prefix = field._name[0: field._name.index('_')]
+            except:
+                logger.InfoMessage(f"Could not create field: {field._name}")
+                continue
+            tableQuery = f"SELECT Bord_Caption FROM dbo.Custom_Tables WHERE Bord_Prefix = '{prefix}'"
+            dfTableName = dal.Reader(tableQuery)
+            tableName = dfTableName.iloc[0,:][0]
+
+            # Check to see if the field exists in the table already
+            existsQuery = f"SELECT TOP 1 {field._name} FROM dbo.{tableName} WITH(NOLOCK)"
+            existCheck = dal.Reader(existsQuery)
+            if existCheck != None:
+                logger.InfoMessage(f"This field exists already: {field._name}")
+                continue
+            
+            # check the type, based on type create that field
+            # Oh no, there is no switch/case in python...
+            if field._type.upper() == 'text':
+                # alter the table, adding the field with the correct size and type
+
+                # Add the record to the custom_captions and custom_edits tables for this record... too tired... can't go on ... did other, more fun ,things ...
+
+            
+
+
+    def ListFields(self):
+        """
+        Method to check what is going to be added
+        """
+        for field in self._fields:
+            print(field._name)
 
 
 # unit tests:
@@ -56,5 +97,3 @@ if __name__ == "__main__":
     actions = SageActions()
     for x in actions._fields:
         print(x._name)
-
-    actions.MetadataRefresh()
