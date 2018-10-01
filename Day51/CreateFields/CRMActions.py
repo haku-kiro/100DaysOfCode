@@ -53,18 +53,34 @@ ORDER BY 1 DESC
         """
         Method to add the field to the entity
         Currently just adds all the fields in the self object
+
+        One side note, would be to transactionilze this so that there are less issues
         """
         dal = DAL.DAL()
 
         for field in self._fields:
             try:
-                prefix = field._name[0: field._name.index('_')]
+                # Get the prefix
+                prefix = field._name[0: field._name.index('_')] # No real point now besides validation (entity changes)
+                # Get nullable
+                nullable = 'NULL' if field._nullable.upper() == 'Y' else 'NOT NULL'
+                # Validate the size
+                size = int(field._size)
+                # validate entity exists
+                tableQuery = f"SELECT Bord_Caption, Bord_tableid FROM dbo.Custom_Tables WHERE Bord_Prefix = '{field._entity}'"
+                dal.Reader(tableQuery) # if throws error, continue # filth
             except:
-                logger.InfoMessage(f"Could not create field: {field._name}")
+                logger.InfoMessage(f"field error: {field._name}")
                 continue
-            tableQuery = f"SELECT Bord_Caption FROM dbo.Custom_Tables WHERE Bord_Prefix = '{prefix}'"
-            dfTableName = dal.Reader(tableQuery)
-            tableName = dfTableName.iloc[0,:][0]
+            # You kind of have to assume that the prefix will remain unique... this a problem ?
+            try:
+                tableQuery = f"SELECT Bord_Caption, Bord_tableid FROM dbo.Custom_Tables WHERE bord_caption = '{field._entity}'"
+                dfTableName = dal.Reader(tableQuery)
+                tableName = dfTableName.iloc[0,:][0]
+                tableId = dfTableName.iloc[0,:][1]
+            except:
+                logger.ErrorMessage(f"The entity: ({field._entity}) does not exist");
+                continue
 
             # Check to see if the field exists in the table already
             existsQuery = f"SELECT TOP 1 {field._name} FROM dbo.{tableName} WITH(NOLOCK)"
@@ -75,12 +91,20 @@ ORDER BY 1 DESC
             
             # check the type, based on type create that field
             # Oh no, there is no switch/case in python...
-            if field._type.upper() == 'text':
+            if field._type.upper() == 'TEXT': # just adds the most simple text field
                 # alter the table, adding the field with the correct size and type
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} NVARCHAR({size}) {nullable}"
+                dal.NonReader(alterSQL)
 
                 # Add the record to the custom_captions and custom_edits tables for this record... too tired... can't go on ... did other, more fun ,things ...
-
-            
+                # Should check if exists already and mark deleted, or ? 
+                cusCaptionsQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')" 
+                dal.NonReader(cusCaptionsQuery)
+                # Note that the colp_datatype might change with each version of CRM, amongst other things
+                cusEditsQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',10,0,NULL,NULL,NULL,N',',NULL,NULL,{size},NULL,NULL,4,{size},NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditsQuery)
+            else:
+                logger.InfoMessage(f"Field not added ({field._name})")
 
 
     def ListFields(self):

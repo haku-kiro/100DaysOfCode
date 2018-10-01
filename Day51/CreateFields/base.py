@@ -26,3 +26,12 @@ import CRMActions as Actions
 
 act = Actions.SageActions()
 act.AddFields()
+
+# dal = DAL.DAL()
+
+# tableQuery = f"SELECT Bord_Caption, Bord_tableid FROM dbo.Custom_Tables WHERE bord_caption = 'cases'"
+# dfTableName = dal.Reader(tableQuery)
+# tableName = dfTableName.iloc[0,:][0]
+# tableId = dfTableName.iloc[0,:][1]
+# print(f"the table id is : {tableId}")
+# print(f"the table name is : {tableName}")
