@@ -85,9 +85,12 @@ ORDER BY 1 DESC
             # Check to see if the field exists in the table already
             existsQuery = f"SELECT TOP 1 {field._name} FROM dbo.{tableName} WITH(NOLOCK)"
             existCheck = dal.Reader(existsQuery)
-            if existCheck != None:
-                logger.InfoMessage(f"This field exists already: {field._name}")
-                continue
+            try:
+                if not existCheck.empty:
+                    logger.InfoMessage(f"This field exists already: {field._name}")
+                    continue
+            except:
+                logger.InfoMessage(f"Creating field: {field._name}")
             
             # check the type, based on type create that field
             # Oh no, there is no switch/case in python...
@@ -103,8 +106,130 @@ ORDER BY 1 DESC
                 # Note that the colp_datatype might change with each version of CRM, amongst other things
                 cusEditsQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',10,0,NULL,NULL,NULL,N',',NULL,NULL,{size},NULL,NULL,4,{size},NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
                 dal.NonReader(cusEditsQuery)
+            elif field._type.upper() == 'INT':
+                # Alter table (No size)
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} INTEGER {nullable}"
+                dal.NonReader(alterSQL)
+                # cus_captions
+                # Cus_edits
+                cusCaptionIntQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')  "
+                dal.NonReader(cusCaptionIntQuery) # should do a row count on this
+                cusEditsIntQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',31,0,NULL,NULL,NULL,N',',NULL,NULL,20,NULL,NULL,5,20,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')" 
+                dal.NonReader(cusEditsIntQuery) # Size, and the entry width same (for int)
+            elif field._type.upper() == "DATETIME":
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} DATETIME {nullable}"
+                dal.NonReader(alterSQL)
+
+                cusCaptionDateTimeQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionDateTimeQuery)
+                cusEditsDateTimeQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',41,0,NULL,NULL,NULL,N',',NULL,NULL,20,NULL,NULL,2,20,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditsDateTimeQuery)
+
+            elif field._type.upper() == 'CURRENCY':
+                # Note that there are two fields created/added when you add a currency field
+                # Also does an update on the field (After creating it)
+                alterSQL1 = f"ALTER TABLE {tableName} ADD {field._name} NUMERIC(24, 6) NULL" # wont allow not null fields
+                dal.NonReader(alterSQL1)
+                # if you seperate your logic, it's one less call here ...
+                alterSQL2 = f"ALTER TABLE {tableName} ADD {field._name}_CID INTEGER NULL"
+                dal.NonReader(alterSQL2)
+
+                updateSQL = f"UPDATE {tableName} SET {field._name}_CID=5" # could cause problems ... with the default currency (should do a lookup)
+                dal.NonReader(updateSQL)
+
+                ## Currency field 1 (Doesn't do a custom caption record for the CID field)
+                cusCaptionCurrencyQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionCurrencyQuery)
+
+                ## Two edits queries
+                cusEditsCID = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_LookupFamily,ColP_System,ColP_DataType,ColP_CustomTableIDFK,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}_CID',N'{tableName}',21,N'CurrencySymbols',N'Y',5,{tableId},-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                cusEditsCurr = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',51,0,NULL,NULL,NULL,N',',NULL,NULL,20,NULL,NULL,6,24,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditsCID)
+                dal.NonReader(cusEditsCurr)
+            
+            elif field._type.upper() == 'NUMERIC':
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} NUMERIC(24, 6) {nullable}"
+                dal.NonReader(alterSQL)
+
+                cusCaptionNumericQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionNumericQuery)
+                cusEditNumericQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field_name}',N'{tableName}',32,0,NULL,NULL,NULL,N',',NULL,NULL,20,NULL,NULL,6,24,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditNumericQuery)
+
+            elif field._type.upper() == 'CHECKBOX':
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} NCHAR(1) NULL"
+                dal.NonReader(alterSQL)
+
+                cusCaptionChckQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionChckQuery)
+                cusEditChckQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',45,0,NULL,NULL,NULL,N',',NULL,NULL,20,NULL,NULL,4,1,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditChckQuery)
+
+            elif field._type.upper() == "MULTI":
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} NVARCHAR(MAX) {nullable}"
+                dal.NonReader(alterSQL)
+
+                cusCaptionMultiQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionMultiQuery)
+                cusEditMultiQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',11,0,NULL,NULL,NULL,N',',NULL,NULL,20,NULL,NULL,4,20,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditMultiQuery)
+
+            elif field._type.upper() == "SELECTION":
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} NVARCHAR(40) NULL" # fun fact, selection fields are 40 chars wide
+                dal.NonReader(alterSQL)
+
+                # Adding the field, need to add the selection as well? (Naaah) 
+                cusCaptionSelQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionSelQuery)
+
+                lookup = ""
+                if field._fieldInfo == "" or field._fieldInfo == field._name:
+                    lookup = field._name
+
+                else:
+                    lookup = field._fieldInfo
+                    # Check to see if that lookup exists
+                    checkQuery = f"SELECT TOP 1 * FROM dbo.custom_captions WHERE capt_family = '{lookup}'"
+                    dfCheck = dal.Reader(checkQuery)
+                    if dfCheck.empty: 
+                        lookup = field._name # if can't find, don't break just set to own field
+
+                cusEditSelQueryCreateLookup = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',21,0,NULL,NULL,NULL,N',',NULL,NULL,1,N'{lookup}',NULL,4,40,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusEditSelQueryCreateLookup)
+
+            elif field._type.upper() == "SSA":
+                # Do ssa checks first (before creating field on the table)
+                cusEditSSAQuery = ""
+                try:
+                    prefix = ""
+                    dfCheck = dal.Reader(f"SELECT TOP 1 bord_prefix, bord_idField FROM dbo.custom_tables WITH(NOLOCK) WHERE bord_caption = '{field._fieldInfo}'")
+                    if dfCheck.empty:
+                        logger.InfoMessage(f"Could not link the ssa field ({field._name}) to the table passed: ({field._fieldInfo})");
+                        continue
+                    else:
+                        prefix = dfCheck.values[0][0]
+                        idField = dfCheck.values[0][1]
+                        dfGetLink = dal.Reader(f"SELECT TOP 1 {prefix}_name FROM {tableName} WITH(NOLOCK)")
+                        try:
+                            if not dfGetLink.empty:
+                                # Create edit with the link to the idfield
+                                cusEditSSAQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',56,0,NULL,NULL,NULL,N',{idField},',NULL,NULL,20,N'{field._fieldInfo}',NULL,5,20,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed') "
+                        except: # filth
+                            # create edit with the link to the name field
+                            cusEditSSAQuery = f"INSERT INTO Custom_Edits(ColP_ColName,ColP_Entity,ColP_EntryType,ColP_DefaultType,ColP_DefaultValue,ColP_SearchSql,ColP_LinkedField,ColP_SSViewField,ColP_StartTime,ColP_EndTime,ColP_EntrySize,ColP_LookupFamily,ColP_LookupWidth,ColP_DataType,ColP_DataSize,Colp_Restricted,ColP_Multiple,Colp_TiedFields,Colp_CanDelete,ColP_CustomTableIDFK,Colp_ExcludeFromIndexing,colp_CreatedBy,colp_CreatedDate,colp_UpdatedBy,colp_UpdatedDate,colp_TimeStamp,colp_Component)  VALUES (N'{field._name}',N'{tableName}',56,0,NULL,NULL,NULL,N',{prefix}_name,',NULL,NULL,20,N'{field._fieldInfo}',NULL,5,20,NULL,NULL,N',',N'Y',{tableId},NULL,-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed') "
+                except:
+                    logger.InfoMessage(f"An error occured when creating the SSA field: {field._name}");
+                    continue
+
+                alterSQL = f"ALTER TABLE {tableName} ADD {field._name} INTEGER NULL"
+                dal.NonReader(alterSQL)
+
+                cusCaptionSSAQuery = f"INSERT INTO Custom_Captions(Capt_FamilyType,Capt_Family,Capt_Code,Capt_DE,Capt_DU,Capt_ES,Capt_FR,Capt_UK,Capt_US,capt_CreatedBy,capt_CreatedDate,capt_UpdatedBy,capt_UpdatedDate,capt_TimeStamp,capt_Component)  VALUES (N'Tags',N'ColNames',N'{field._name}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',N'{field._caption}',-42,GETDATE(),-42,GETDATE(),GETDATE(),N'Changed')"
+                dal.NonReader(cusCaptionSSAQuery)
+
+                dal.NonReader(cusEditSSAQuery)
             else:
-                logger.InfoMessage(f"Field not added ({field._name})")
+                logger.InfoMessage(f"Field not added !({field._name})!")
 
 
     def ListFields(self):

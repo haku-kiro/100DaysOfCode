@@ -35,3 +35,26 @@ act.AddFields()
 # tableId = dfTableName.iloc[0,:][1]
 # print(f"the table id is : {tableId}")
 # print(f"the table name is : {tableName}")
+
+
+# dfTables = dal.Reader("SELECT bord_caption, bord_prefix, bord_IdField FROM dbo.custom_tables")
+
+
+
+# success = 0
+# fail = 0
+
+# print(dfTables.values[0][0])
+
+# # for table, prefix, idfield in dfTables.values:
+# #     try:
+# #         dftemp = dal.Reader(f"SELECT TOP 1 {prefix}_description FROM dbo.{table}")
+# #         thing = dftemp.iloc[0]
+# #         success += 1
+# #     except:
+# #         fail += 1
+# #         continue
+# # print(f"Success: {success}")
+# # print(f"Fail: {fail}")
+
+

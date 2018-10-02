@@ -6,7 +6,7 @@ class colRow:
     """
     Defines the column being addeds meta data
     """ 
-    def __init__(self, name, type, size, caption, nullable, entity):
+    def __init__(self, name, type, size, caption, nullable, entity, fieldInfo):
         """
         Create an instance of the colRow
         """
@@ -16,6 +16,7 @@ class colRow:
         self._caption = caption
         self._nullable = nullable
         self._entity = entity
+        self._fieldInfo = fieldInfo
 
 # Create an instance of me
 class ColLoader:
@@ -30,7 +31,7 @@ class ColLoader:
             header = f.readline() # pulling the header out ... again, use pandas ...
             for line in f:
                 data = line.split(',')
-                item = colRow(data[0], data[1], data[2], data[3], data[4], data[5])
+                item = colRow(data[0], data[1], data[2], data[3], data[4], data[5], data[6])
                 colsToBeCreated.append(item)
 
         self._cols = colsToBeCreated
@@ -38,4 +39,5 @@ class ColLoader:
 # unit tests
 if __name__ == '__main__':
     loader = ColLoader()
-    print(loader._cols)
+    for x in loader._cols:
+        print("thing: " + x._fieldInfo)
