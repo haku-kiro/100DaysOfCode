@@ -265,3 +265,6 @@ Config.py
 
 # random log files 
 LogFile.txt
+
+# ignore note readmes as they contain things that aren't mine
+notes.md
