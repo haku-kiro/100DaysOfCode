@@ -15,7 +15,7 @@ econ_data = DataReader(series, 'fred', start)
 econ_data.columns = ['Unemployment Rate','Participation Rate']
 
 # Plot econ_data
-econ_data.plot(title='Labor Market') # subplots renders a plot for each dframe
+econ_data.plot(title='Labor Market', subplots=True) # subplots renders a plot for each dframe
 
 # Show the plot
 plt.show()
