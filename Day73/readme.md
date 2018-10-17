@@ -1,16 +1,16 @@
-# Day 72
+# Day 73
 
 ## Objectives
 
-- Datacamp
+- Book I have on app development, going through that.
 
 ## Resources
 
-- Datacamp.com
+- Book
 
 ### Setup
 
-- Site
+- Had to install Android studio
 
 ### Suggested plan for tomorrow
 
@@ -30,3 +30,4 @@
 
 ### Random Notes
 
+- Quite a lot better than xamarin, IMO
