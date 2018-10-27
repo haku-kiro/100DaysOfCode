@@ -1,0 +1,1 @@
+# django-admin startproject <Site Name> Creates an empty template for your website/app
